@@ -333,7 +333,7 @@ $$ \min_{||x||_\infty \leq 1/\lambda} L(x).$$
 
 If $L$ is additionally convex, then AdamW converges to the constrained minimizer,
 
-$$ x_\infty \in 	ext{argmin}_{||x||_\infty \leq 1/\lambda} L(x).$$
+$$ x_\infty \in \text{argmin}_{||x||_\infty \leq 1/\lambda} L(x).$$
 
 <details id="proof-adamw">
 <summary>Click to view proof</summary>
@@ -561,7 +561,7 @@ $$ \min_{||x||_\infty \leq 1/\lambda} L(x).$$
 
 If $L$ is additionally convex, then Adam-atan2 converges to the constrained minimizer,
 
-$$ x_\infty \in 	ext{argmin}_{||x||_\infty \leq 1/\lambda} L(x).$$
+$$ x_\infty \in \text{argmin}_{||x||_\infty \leq 1/\lambda} L(x).$$
 
 *Proof.* The proof relies structurally on the same arguments as Xie and Li, Theorem 1.1. We prove that the limit point of Adam-atan2 satisfies the conditions of Lemma 3.8 by showing that $|\overline{\Delta}_{\infty, i}| \leq 1$ for all components $i$, from which the Corollary follows.
 
@@ -627,7 +627,7 @@ If $x\to x_\infty$ converges under this algorithm, then
 
     $$\min_{||x||_2 \leq R} L(x).$$
 
-3. Further, if $L$ is convex, $x_\infty \in 	ext{argmin}_{||x||_2\leq R}L(x)$ is a global minimizer.
+3. Further, if $L$ is convex, $x_\infty \in \text{argmin}_{||x||_2\leq R}L(x)$ is a global minimizer.
 
 Note that the $\ell_2$-norm $R$ of $x_\infty$ is unbounded, in contrast to the $\ell_\infty$ case where the norm is bounded by $1/\lambda < \infty$.
 
@@ -684,7 +684,7 @@ Since CKA and PWCCA compute similarity scores, their complement $1-\rho$ is a *d
 
 $$ S(x_1,\dots, x_n; f) = \left(\frac{\sum_{i<j}(f(d_{ij}) - \hat{d}_{ij})^2}{\sum_{i<j}{\hat{d}_{ij}}^2}\right)^{1/2}$$
 
-Here $f$ is a monotonically-increasing function. NMDS is optimized by iteratively optimizing the two objectives $\hat f = 	ext{argmin}_f S(x_1, \dots, x_n; f)$ and $	ext{argmin}_{\{x_i\}_{i=1}^n} S(x_1,\dots, x_n; \hat f)$.
+Here $f$ is a monotonically-increasing function. NMDS is optimized by iteratively optimizing the two objectives $\hat f = \text{argmin}_f S(x_1, \dots, x_n; f)$ and $\text{argmin}_{\{x_i\}_{i=1}^n} S(x_1,\dots, x_n; \hat f)$.
 
 #### 2.5.2 Isomap
 
