@@ -164,7 +164,7 @@ Using this, we can now rewrite Maximum Mean Discrepancy (MMD) as
 
 $$ \text{MMD}(P, Q) = \sup_{||f||_\mathcal{H} \leq 1} \langle f, \mu_P - \mu_Q \rangle = ||\mu_P - \mu_Q||_\mathcal{H}$$
 
-where in the second step we have used Cauchy-Schwarz, with equality when $f^* = (\mu_P - \mu_Q)/||\mu_P - \mu_Q||_\mathcal{H}$. Expanding squared MMD,
+where in the second step we have used Cauchy-Schwarz, with equality when $f^{\ast} = (\mu_P - \mu_Q)/||\mu_P - \mu_Q||_\mathcal{H}$. Expanding squared MMD,
 
 <div id="eq:mmdsq">
 
@@ -294,8 +294,8 @@ AdamW, or Adaptive Momentum with Decoupled Weight Decay, is an adaptive momentum
 <details>
 <summary>Click to view the AdamW algorithm</summary>
 
-$$
-\begin{array}{l}
+```math
+\begin{array}
 \textbf{Algorithm: } \text{Adam with Decoupled Weight Decay (AdamW)} \\
 \textbf{Input: }\text{Learning rate }\eta\text{, Weight decay }\lambda\text{, Exponential decay rates }\beta_1, \beta_2 \in [0, 1)\text{,}\\
 \qquad\quad~ \text{Constant }\epsilon > 0\text{, Initial parameters }\theta_0\text{, Objective function }L(\theta)\\
@@ -313,7 +313,7 @@ $$
 10.~ \textbf{end while}\\
 11.~ \textbf{return }\theta_t
 \end{array}
-$$
+```
 
 **Comments:**
 
@@ -321,7 +321,9 @@ $$
 2. Lines 7, 8 apply an important bias correction to the first and second moments $m_t$, $v_t$ since early in training they are very small.
 3. The weight update in line 9 separately applies weight decay $\lambda\theta_{t-1}$ from momentum $\frac{\hat m_t}{\sqrt{\hat v_t} + \epsilon}$. This distinguishes AdamW from Adam with $\ell_2$-regularization, which applies "weight decay" to the gradient in line 4, 
 
-$$ g_t \leftarrow \nabla_\theta f(\theta_{t-1}) + \lambda \theta_{t-1} $$
+```math
+g_t \leftarrow \nabla_\theta f(\theta_{t-1}) + \lambda \theta_{t-1}
+```
 
 </details><br>
 
@@ -339,7 +341,9 @@ $$ x_\infty \in \text{argmin}_{||x||_\infty \leq 1/\lambda} L(x).$$
 <summary>Click to view proof</summary>
 
 *Proof (sketch).* The full proof can be found in the [paper](https://arxiv.org/abs/2404.04454). We begin by recalling the definition of a KKT point. Consider the general continuous optimization problem
-$$\begin{aligned}
+
+$$
+\begin{aligned}
 \min_{x\in \mathbb{R}^n} &~~ f(x) \\
 \text{subject to} &~~ g_i(x) \leq 0,\quad i =1,\dots, m \\
 &~~ h_j(x) = 0,\quad j =1,\dots, p
@@ -351,16 +355,16 @@ $$ \mathcal{L}(x, \mu, \nu) = f(x) + \langle \mu, g(x)\rangle + \langle \nu, h(x
 
 The vectors $\mu, \nu$ are generalized Lagrange multiplers called *dual variables*.
 
-A point $(x^*, \mu^*, \nu^*) \in \mathbb{R}^n\times \mathbb{R}^m \times \mathbb{R}^p$ is a **Karush-Kuhn-Tucker** (**KKT**) point if it satisfies the following conditions:
+A point $(x^{\ast}, \mu^{\ast}, \nu^{\ast}) \in \mathbb{R}^n\times \mathbb{R}^m \times \mathbb{R}^p$ is a **Karush-Kuhn-Tucker** (**KKT**) point if it satisfies the following conditions:
 
-1. **Stationarity**: $0 \in \partial \mathcal{L}(x^*, \mu^*, \nu^*)$
-2. **Primal Feasibility**: $g_i(x^*) \leq 0$ and $h_j(x^*) = 0$ for all $i,j$
-3. **Dual Feasibility**: $\mu_i^* \geq 0$ for all $i=1,\dots, m$
-4. **Complementary Slackness**: $\langle \mu^*, g(x^*)\rangle =0$.
+1. **Stationarity**: $0 \in \partial \mathcal{L}(x^{\ast}, \mu^{\ast}, \nu^{\ast})$
+2. **Primal Feasibility**: $g_i(x^{\ast}) \leq 0$ and $h_j(x^{\ast}) = 0$ for all $i,j$
+3. **Dual Feasibility**: $\mu_i^{\ast} \geq 0$ for all $i=1,\dots, m$
+4. **Complementary Slackness**: $\langle \mu^{\ast}, g(x^{\ast})\rangle =0$.
 
-A KKT point with positive-definite Hessian is a local minimum. Moreover, if the objective function $f$ and the $g_i$ are convex, and $h_i$ are affine, then $(x^*, \lambda^*, \nu^*)$ being a KKT point implies that $x^*$ is a global minimum of $f$.
+A KKT point with positive-definite Hessian is a local minimum. Moreover, if the objective function $f$ and the $g_i$ are convex, and $h_i$ are affine, then $(x^{\ast}, \lambda^{\ast}, \nu^{\ast})$ being a KKT point implies that $x^{\ast}$ is a global minimum of $f$.
 
-However, not every local minimum $x^*$ is a KKT point. In order for it to be so, the point $x^*$ must also satisfy a regularity condition; one example is Linear Independence Constraint Qualification (LICQ), which states that the gradients of the $h_i$ and the *active* $g_i$ are linearly-independent at $x^*$.
+However, not every local minimum $x^{\ast}$ is a KKT point. In order for it to be so, the point $x^{\ast}$ must also satisfy a regularity condition; one example is Linear Independence Constraint Qualification (LICQ), which states that the gradients of the $h_i$ and the *active* $g_i$ are linearly-independent at $x^{\ast}$.
 
 It suffices to prove the first part of the theorem. Consider the Lagrangian of the constrained optimization problem:
 
@@ -384,37 +388,37 @@ Xie and Li proved Theorem 1.1 by establishing two things:
 
 We begin by a proof of Lemma 3.8.
 
-*Proof. (Lemma 3.8)* Primal feasibility for constrained optimization problem [2](#eq:optlag) says $||x^*||_\infty \leq 1/\lambda$ while stationarity says
+*Proof. (Lemma 3.8)* Primal feasibility for constrained optimization problem [2](#eq:optlag) says $||x^{\ast}||_\infty \leq 1/\lambda$ while stationarity says
 
-$$ 0\in \partial\mathcal{L}(x^*, \mu^*) = \nabla L(x^*) + \mu \partial ||x^*||_\infty,$$
+$$ 0\in \partial\mathcal{L}(x^{\ast}, \mu^{\ast}) = \nabla L(x^{\ast}) + \mu \partial ||x^{\ast}||_\infty,$$
 
-or $-\nabla L(x^*) \in \mu \partial ||x^*||_\infty$. Since $\mu\partial ||x^*||_\infty = \{ w\in \mathbb{R}^d \mid \langle w, x^*\rangle = ||x^*||_\infty \} \text{ and }||w||_1 \leq \mu $, stationarity implies
+or $-\nabla L(x^{\ast}) \in \mu \partial ||x^{\ast}||_\infty$. Since $\mu\partial ||x^{\ast}||_\infty = \{ w\in \mathbb{R}^d \mid \langle w, x^{\ast}\rangle = ||x^{\ast}||_\infty \} \text{ and }||w||_1 \leq \mu $, stationarity implies
 
-$$\langle -\nabla L(x^*), x^* \rangle = \mu||x^*||_\infty\text{ and }||-\nabla L(x^*)||_1 \leq \mu.$$
+$$\langle -\nabla L(x^{\ast}), x^{\ast} \rangle = \mu||x^{\ast}||_\infty\text{ and }||-\nabla L(x^{\ast})||_1 \leq \mu.$$
 
 Expand on the cases of primal feasibility:
 
-- $x^*$ is an interior point ($||x^*||_\infty < 1/\lambda$): by complementary slackness, $\mu^* = 0$, shich implies $\nabla L(x^*) = 0$.
-- $x^*$ is a boundary point ($||x^*||_\infty = 1/\lambda$): the minimal value of $\mu$ required to satisfy stationarity is $\mu = ||\nabla L(x^*)||_1$.
+- $x^{\ast}$ is an interior point ($||x^{\ast}||_\infty < 1/\lambda$): by complementary slackness, $\mu^{\ast} = 0$, shich implies $\nabla L(x^{\ast}) = 0$.
+- $x^{\ast}$ is a boundary point ($||x^{\ast}||_\infty = 1/\lambda$): the minimal value of $\mu$ required to satisfy stationarity is $\mu = ||\nabla L(x^{\ast})||_1$.
 
-In both cases, it's true that for a KKT point $(x^*, \mu^*)$:
-$$ \langle -\nabla L(x^*), x^* \rangle = \mu^*||x^*||_\infty = \frac{1}{\lambda}|| \nabla L(x^*)||_1,\quad\implies\quad \langle -\lambda x^*, \nabla L(x^*)\rangle = ||\nabla L(x^*)||_1.$$
+In both cases, it's true that for a KKT point $(x^{\ast}, \mu^{\ast})$:
+$$ \langle -\nabla L(x^{\ast}), x^{\ast} \rangle = \mu^{\ast}||x^{\ast}||_\infty = \frac{1}{\lambda}|| \nabla L(x^{\ast})||_1,\quad\implies\quad \langle -\lambda x^{\ast}, \nabla L(x^{\ast})\rangle = ||\nabla L(x^{\ast})||_1.$$
 
-The reverse direction follows by choosing $\mu^* = ||\nabla L(x^*)||_1$. Assume $||x^*||_\infty\leq 1/\lambda$ and $\langle -\lambda x^*, \nabla L(x^*)\rangle = ||\nabla L(x^*)||_1$. If $\nabla L(x^*) = 0$ then all four KKT conditions are vacuously true. Suppose then that $\nabla L(x^*)\neq 0$. Primal and dual feasibility are manifestly satisfied. To verify complementary slackness, note that by Cauchy-Schwarz
+The reverse direction follows by choosing $\mu^{\ast} = ||\nabla L(x^{\ast})||_1$. Assume $||x^{\ast}||_\infty\leq 1/\lambda$ and $\langle -\lambda x^{\ast}, \nabla L(x^{\ast})\rangle = ||\nabla L(x^{\ast})||_1$. If $\nabla L(x^{\ast}) = 0$ then all four KKT conditions are vacuously true. Suppose then that $\nabla L(x^{\ast})\neq 0$. Primal and dual feasibility are manifestly satisfied. To verify complementary slackness, note that by Cauchy-Schwarz
 
-$$ ||\nabla L(x^*)||_1 = \langle -\lambda x^*, \nabla L(x^*)\rangle \leq ||\lambda x^*||_\infty\cdot ||\nabla L(x^*)||_1 \leq ||\nabla L(x^*)||_1.$$
+$$ ||\nabla L(x^{\ast})||_1 = \langle -\lambda x^{\ast}, \nabla L(x^{\ast})\rangle \leq ||\lambda x^{\ast}||_\infty\cdot ||\nabla L(x^{\ast})||_1 \leq ||\nabla L(x^{\ast})||_1.$$
 
-Therefore both inequalities are equalities. Dividing through by $||\nabla L(x^*)||_1 > 0$ gives $||\lambda x^*||_\infty = 1$, so
+Therefore both inequalities are equalities. Dividing through by $||\nabla L(x^{\ast})||_1 > 0$ gives $||\lambda x^{\ast}||_\infty = 1$, so
 
-$$ \mu^* \left( ||x^*||_\infty - \frac{1}{\lambda}\right) = 0.$$
+$$ \mu^{\ast} \left( ||x^{\ast}||_\infty - \frac{1}{\lambda}\right) = 0.$$
 
-To prove stationarity note that $0 \in \nabla L(x^*) + \mu^* \partial ||x^*||_\infty$ is equivalent to $-\frac{1}{\mu^*} \nabla L(x^*) \in \partial ||x^*||_\infty$. By properties of dual norm subgradients, this requires
+To prove stationarity note that $0 \in \nabla L(x^{\ast}) + \mu^{\ast} \partial ||x^{\ast}||_\infty$ is equivalent to $-\frac{1}{\mu^{\ast}} \nabla L(x^{\ast}) \in \partial ||x^{\ast}||_\infty$. By properties of dual norm subgradients, this requires
 
-$$|| - \frac{1}{\mu^*} \nabla L(x^*)||_1 = 1\quad \text{and} \quad \left\langle -\frac{1}{\mu^*} \nabla L(x^*), x^* \right\rangle = ||x^*||_\infty.$$
+$$|| - \frac{1}{\mu^{\ast}} \nabla L(x^{\ast})||_1 = 1\quad \text{and} \quad \left\langle -\frac{1}{\mu^{\ast}} \nabla L(x^{\ast}), x^{\ast} \right\rangle = ||x^{\ast}||_\infty.$$
 
-The first condition is true by substitution of $\mu^*$. The second condition is true since
+The first condition is true by substitution of $\mu^{\ast}$. The second condition is true since
 
-$$\left\langle -\frac{1}{\mu^*} \nabla L(x^*), x^* \right\rangle = \frac{\langle -\lambda x^*, \nabla L(x^*)\rangle}{\lambda \mu^*} = \frac{||\nabla L(x^*)||_1}{\lambda\mu^*} = \frac{1}{\lambda} = ||x^*||_\infty. \qquad\Box$$
+$$\left\langle -\frac{1}{\mu^{\ast}} \nabla L(x^{\ast}), x^{\ast} \right\rangle = \frac{\langle -\lambda x^{\ast}, \nabla L(x^{\ast})\rangle}{\lambda \mu^{\ast}} = \frac{||\nabla L(x^{\ast})||_1}{\lambda\mu^{\ast}} = \frac{1}{\lambda} = ||x^{\ast}||_\infty. \qquad\Box$$
 
 We now finish the proof sketch of Theorem 1.1 by proving that the limit point $x_\infty$ of AdamW satisfies condition [3](#eq:kktchar). The following lemma will be of use
 
@@ -530,7 +534,7 @@ $$\theta_t \leftarrow \theta_{t-1} - \alpha \left( \arctan\left(\frac{\hat{m}_t}
 <details>
 <summary>Click to view the Adam-atan2 algorithm</summary>
 
-$$
+```math
 \begin{array}{l}
 \textbf{Algorithm: } \text{Adam-atan2} \\
 \textbf{Input: }\text{Learning rate }\eta\text{, Weight decay }\lambda\text{, Exponential decay rates }\beta_1, \beta_2 \in [0, 1)\text{,}\\
@@ -549,7 +553,7 @@ $$
 10.~ \textbf{end while}\\
 11.~ \textbf{return }\theta_t
 \end{array}
-$$
+```
 
 </details><br>
 
@@ -561,7 +565,9 @@ $$ \min_{||x||_\infty \leq 1/\lambda} L(x).$$
 
 If $L$ is additionally convex, then Adam-atan2 converges to the constrained minimizer,
 
-$$ x_\infty \in \text{argmin}_{||x||_\infty \leq 1/\lambda} L(x).$$
+```math
+x_\infty \in \text{argmin}_{||x||_\infty \leq 1/\lambda} L(x).
+```
 
 *Proof.* The proof relies structurally on the same arguments as Xie and Li, Theorem 1.1. We prove that the limit point of Adam-atan2 satisfies the conditions of Lemma 3.8 by showing that $|\overline{\Delta}_{\infty, i}| \leq 1$ for all components $i$, from which the Corollary follows.
 
@@ -660,7 +666,7 @@ Note that the $\ell_2$-norm $R$ of $x_\infty$ is unbounded, in contrast to the $
 
     $$\mathcal{L}(x, \mu) = L(x) + \mu g(x).$$
 
-    Primal feasibility $g(x_\infty) \leq 0$ is true by definition of $R$. Stationarity $\nabla L(x_\infty) + \mu x_\infty = 0$ is true for dual variable $\mu^* = \lambda > 0$, which also satisfies dual feasibility. Complementary slackness $\mu g(x_\infty) = 0$ holds since $g(x_\infty) = 0$.
+    Primal feasibility $g(x_\infty) \leq 0$ is true by definition of $R$. Stationarity $\nabla L(x_\infty) + \mu x_\infty = 0$ is true for dual variable $\mu^{\ast} = \lambda > 0$, which also satisfies dual feasibility. Complementary slackness $\mu g(x_\infty) = 0$ holds since $g(x_\infty) = 0$.
 
 3. The Lagrangian $\mathcal{L}(x, \mu)$ is $\mu$-strongly convex and therefore has a global minimizer given by the KKT-point.$\qquad \Box$
 
