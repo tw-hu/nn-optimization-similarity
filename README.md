@@ -2,12 +2,13 @@
 
 This repository is a detailed writeup of the theory, methodology, and results of a project as part of a course on [unsupervised learning](https://www.ttic.edu/courses/#ulda) held in Spring 2026 at the Toyota Technological Institute at Chicago (TTIC). The main goal was to gain a better understanding the dynamical process of optimization through the lens of feature learning and representational similarity analysis (RSA).
 
-<p align="center">
-  <figure>
-    <img width="400" height="300" alt="sgd_sgd" src="https://github.com/user-attachments/assets/4e0a6713-5e12-41c1-bc95-e49efee43cd4" /> <img width="400" height="300" alt="atan_atan" src="https://github.com/user-attachments/assets/08cb5e00-a3b3-4048-b83a-addb56d773f7" />
-    <figcaption style="text-align: center;"><em>Figure 1: Similarity between layers of a neural network at training time versus its final state.</em></figcaption>
-  </figure>
-</p>
+<table align="center">
+  <tr>
+    <td align="center"><img src="https://github.com/user-attachments/assets/4e0a6713-5e12-41c1-bc95-e49efee43cd4" width="400"><br><sub>(a) SGD</sub></td>
+    <td align="center"><img src="https://github.com/user-attachments/assets/08cb5e00-a3b3-4048-b83a-addb56d773f7" width="400"><br><sub>(b) Adam-atan2</sub></td>
+  </tr>
+</table>
+<p align="center"><em>Similarity between layers of a neural network at training time versus its final state.</em></p>
 
 ## 1. Introduction
 
@@ -23,7 +24,9 @@ One way to view a neural network is as a parameterized function with universal a
 
 A natural question is to ask how two neural networks compare. The answer from the functional viewpoint is to use a distance measure $`||\cdot||: \Theta \to \mathbb{R}_+`$ on the space of parameters, where $`\Theta`$ is a [singular analytic space/variety](https://www.lesswrong.com/s/mqwA5FcL6SrHEQzox/p/fovfuFdpuEwQzJu2w) given by quotienting the non-singular parameter space by the group of symmetries. This quotient arises because permutation symmetries on weight space can give rise to different networks with otherwise identical functional outputs. For simple architectures, [it is possible](https://arxiv.org/abs/2209.04836) to "resolve" the singularity in a way that preserves the geometry of the generalization basin, but this approach seems difficult to scale to larger architectures with more complicated symmetries. By contrast, the output $`y`$ of neurons always live in a vector space $`\mathcal{Y}`$, and the symmetries of $`y`$ are at most a subgroup $`G`$ of $`\text{GL}(\dim \mathcal{Y}, \mathbb{R})`$. An analysis of activations, rather than of weights, therefore benefits from scalability and being able to leverage the full theory of linear algebra. Indeed, [one way](https://proceedings.neurips.cc/paper_files/paper/2021/hash/252a3dbaeb32e7690242ad3b556e626b-Abstract.html) to view representational similarity analysis (RSA) is as a science of constructing insightful $`G`$-equivariant metrics on $`\mathcal{Y}`$ with [different choices](https://dl.acm.org/doi/full/10.1145/3728458) of $`G`$.
 
-In this project we visualize of the relationship between the space of trained models and the way in which they are optimized during training through the lens of representational similarity. We are interested especially about the dynamics of training and their relation to the final trained model. Our theoretical contributions are an extension the proof of theorem 1.1 of [Xie and Li (2024)](https://arxiv.org/abs/2404.04454) to characterizations of the limit point of Adam-atan2 and GD with Nesterov/look-ahead momentum in the full batch setting, and our empirical contributions are summarized [below](#12-summary-of-results). For each point, we present empirical data and theoretical justification for our conclusions.
+In this project we visualize the relationship between the space of trained models and the way in which they are optimized during training through the lens of representational similarity. We are interested especially about the dynamics of training and their relation to the final trained model. A number of similarity measures have been previously proposed to answer this question, including SVCCA ([Raghu et al., 2017](https://proceedings.neurips.cc/paper_files/paper/2017/hash/dc6a7e655d7e5840e66733e9ee67cc69-Abstract.html)), PWCCA ([Morcos et al., 2018](https://proceedings.neurips.cc/paper_files/paper/2018/hash/a7a3d70c6d17a73140918996d03c014f-Abstract.html)), and CKA ([Kornblith et al., 2019](https://proceedings.mlr.press/v97/kornblith19a.html)). These metrics have been used to study the stability of representations ([Morcos et al., 2018](https://proceedings.neurips.cc/paper_files/paper/2018/hash/a7a3d70c6d17a73140918996d03c014f-Abstract.html)), the behavior with scaling layer width, as well as comparing representations learned across different datasets ([Kornblith et al., 2019](https://proceedings.mlr.press/v97/kornblith19a.html)). In this project we extend these studies to the dynamics of convolutional neural networks in-training and how learned representations can reveal the implicit bias of the optimizer.
+
+Our theoretical contributions are an extension of the proof of Theorem 1.1 of [Xie and Li (2024)](https://arxiv.org/abs/2404.04454) to characterize the limit points of Adam-atan2 and GD with Nesterov/look-ahead momentum in the full batch setting, and our empirical contributions are summarized [below](#12-summary-of-results). For each point, we present empirical data and theoretical justification for our conclusions.
 
 Studies were conducted using a VGG-style convolutional autoencoder trained to optimize $`\ell_2`$-reconstruction loss on the CIFAR-10 dataset (for more details on the experimental setup see [below](#3-experimental-setup)). The model was chosen for its simplicity and the objective was chosen for its bias for rich feature learning: classifier models are known to suffer from spurious correlation and can produce misleading features, degrading the quality of our analysis. By contrast, the task of reconstruction forces the model to learn features with varying scale and complexity.
 
@@ -55,7 +58,7 @@ Let $`Z = \{z_i\}_{i=1}^{m}`$ be an i.i.d. sample drawn from the test distributi
 Z^{(\ell)} = [z_1^{(\ell)}, z_2^{(\ell)},\dots, z_m^{(\ell)}]
 ```
 
-of shape $`(m, c^{(\ell)}, h^{(\ell)}, w^{(\ell)})`$. In this project analyze the neural pre-activations of layers rather than their activations for the reason that they live in a genuine vector space; post-ReLU activations live in a half-space with oriented boundary. Using activations presents an issue since the oriented boundary is basis-dependent when the RSA scores we are using are basis-independent.
+of shape $`(m, c^{(\ell)}, h^{(\ell)}, w^{(\ell)})`$. In this project we analyze the neural pre-activations of layers rather than their activations for the reason that they live in a genuine vector space; post-ReLU activations live in a half-space with oriented boundary. Using activations presents an issue since the oriented boundary is basis-dependent when the RSA scores we are using are basis-independent.
 
 ### 2.2 Representational Similarity Measures
 
@@ -82,10 +85,10 @@ Concretely, PWCCA does the following. For $`1\leq i\leq k`$, the $`i`$-th canoni
 subject to the constraint that $`\left\langle X v_i, X v_j\right\rangle = 0`$ and $`\left\langle Y w_i, Y w_j\right\rangle = 0`$ for all $`j < i`$ (subsequent canonical directions are uncorrelated with previous ones). PWCCA then computes a weighted sum of canonical coefficients
 
 ```math
-\rho_{\text{PWCCA}}(X, Y) = \frac{\sum_{i=1}^k \alpha_i \rho_i}{\sum_{i=1}^k \alpha_i},\qquad\text{ where }\alpha_i = \sum_j | \left\langle h_i, x_j \right\rangle|
+\rho_{\text{PWCCA}}(X, Y) = \frac{\sum_{i=1}^k \alpha_i \rho_i}{\sum_{i=1}^k \alpha_i},\qquad\text{ where }\alpha_i = \sum_j | \left\langle h_i, u_j \right\rangle|
 ```
 
-is the "responsibility weight" of direction $`i`$ for the activations $`X`$. Here $`x_j \in \mathbb{R}^m`$ is the $`j`$-th column (neuron) of $`X`$ and $`h_i = X v_i`$ is the projection of $`X`$ onto the $`i`$-th canonical direction. Note that PWCCA is not symmetric in $`X, Y`$. The solution to the constrained optimization problem for the $`\rho_i`$ is given by the following algorithm:
+is the "responsibility weight" of direction $`i`$ for the activations $`X`$. Here $`u_j`$ is the $`j`$-th column of $`X`$ and $`h_i = X v_i`$ is the projection of $`X`$ onto the $`i`$-th canonical direction. Note that PWCCA is not symmetric in $`X, Y`$. The solution to the constrained optimization problem for the $`\rho_i`$ is given by the following algorithm:
 
 <details>
 <summary>Click to view the PWCCA algorithm</summary>
@@ -101,10 +104,10 @@ is the "responsibility weight" of direction $`i`$ for the activations $`X`$. Her
 3:~ W_X, W_Y, \rho \leftarrow \text{CCA}(X, Y)\\
 4:~ H \leftarrow X W_X\\
 5:~ \textbf{for } i = 1 \text{ to len}(\rho)  \textbf{ do} \\
-6:~ \quad \tilde{\alpha}_i \leftarrow \sum_{j=1}^{d_1} |\langle h_i, x_j \rangle|\\
+6:~ \quad \tilde{\alpha}_i \leftarrow \sum_{j=1}^{d_1} |\langle h_i, u_j \rangle|\\
 7:~ \textbf{for } i = 1 \text{ to len}(\rho) \textbf{ do} \\
-8:~ \quad \alpha_i \leftarrow \frac{\tilde{\alpha}_i}{\sum_{k=1}^c \tilde{\alpha}_k}\\
-9:~ s \leftarrow \sum_{i=1}^c \alpha_i \rho_i\\
+8:~ \quad \alpha_i \leftarrow \frac{\tilde{\alpha}_i}{\sum_{k=1}^{\text{len}(\rho)} \tilde{\alpha}_k}\\
+9:~ s \leftarrow \sum_{i=1}^{\text{len}(\rho)} \alpha_i \rho_i\\
 10:~ \textbf{return } s
 \end{array}
 ```
@@ -141,9 +144,9 @@ Another representational similarity measure we use in our analysis is Centered K
 
 </div>
 
-Let's unpack this equation. Note that the trace on the right is equal to $`\langle \text{vec}(XX^\top), \text{vec}(YY^\top)\rangle = ||{Y^\top X}||_F^2`$. The quantities $`XX^\top`$, $`YY^\top`$ are the Gram matrices of $`X`$ and $`Y`$ and represent the similarity between representations generated by examples within $`X`$ and $`Y`$. More explicitly, $`(XX^\top)_{ij}`$ is the inner product of the feature vector of the $`i`$-th and $`j`$-th examples. So $`||{Y^\top X}||_F^2`$, equal to the inner product of flattened Gram matrices, computes a "similarity of similarities." [Kornblith et al. (2019)](https://proceedings.mlr.press/v97/kornblith19a.html) generalizes Equation [1](#eq:fncovmat) to inner products on Reproducing Kernel Hilbert Spaces (RKHS), where the Frobenius norm $`||\cdot||^2_F`$ of the cross-covariance matrix is replaced by the squared Hilbert-Schmidt norm of an arbitrary kernel operator, of which covariance is an example ($`K(X, Y) = X^\top Y`$).
+To unpack this equation, note that the trace on the right is equal to $`\langle \text{vec}(XX^\top), \text{vec}(YY^\top)\rangle = ||{Y^\top X}||_F^2`$. The quantities $`XX^\top`$, $`YY^\top`$ are the Gram matrices of $`X`$ and $`Y`$ and represent the similarity between representations generated by examples within $`X`$ and $`Y`$. More explicitly, $`(XX^\top)_{ij}`$ is the inner product of the feature vector of the $`i`$-th and $`j`$-th examples. So $`||{Y^\top X}||_F^2`$, equal to the inner product of flattened Gram matrices, computes a "similarity of similarities." [Kornblith et al. (2019)](https://proceedings.mlr.press/v97/kornblith19a.html) generalizes Equation [1](#eq:fncovmat) to inner products on Reproducing Kernel Hilbert Spaces (RKHS), where the Frobenius norm $`||\cdot||^2_F`$ of the cross-covariance matrix is replaced by the squared Hilbert-Schmidt norm of an arbitrary kernel operator, of which covariance is an example ($`K(X, Y) = X^\top Y`$).
 
-Why might one want to do this? Suppose we are interested in comparing two probability distributions $`P, Q`$ (in the case of interest $`P, Q`$ will be the distributions of pre-activations, some functional transform of sample space $`\mathcal{D}`$). A natural way to go about this is to compare their means, variances, or higher moments. If $`P, Q`$ are both bounded and have compact support, then $`P = Q`$ if and only if all their higher moments agree. This is however an impossible condition to check! A more tractable approach $`P, Q`$ is to map them into an infinite-dimensional feature space and utilize the theory of Reproducing Kernel Hilbert Spaces (RKHS) to give a definite answer. We will now unpack this following [these](https://arxiv.org/abs/2503.04820) notes, but the details of RKHS will not play an important role in the main analysis and can be [skipped](#23-aggregate-model-to-model-metrics).
+Why might one want to do this? Suppose we are interested in comparing two probability distributions $`P, Q`$ (in the case of interest $`P, Q`$ will be the joint and product of marginal distributions of pre-activations, which are themselves functional transform of sample space $`\mathcal{D}`$). A natural way to go about this is to compare their means, variances, or higher moments. If $`P, Q`$ are both bounded and have compact support, then $`P = Q`$ if and only if all their higher moments agree. This is however an impossible condition to check! A more tractable approach $`P, Q`$ is to map them into an infinite-dimensional feature space and utilize the theory of Reproducing Kernel Hilbert Spaces (RKHS) to give a definite answer. We will now unpack this following [these](https://arxiv.org/abs/2503.04820) notes, but the details of RKHS will not play an important role in the main analysis and can be [skipped](#23-aggregate-model-to-model-metrics).
 
 The only operation on $`P, Q`$ that can be estimated cheaply is expectation,
 
@@ -224,7 +227,7 @@ Note that the last expression is the (Hilbert-Schmidt) norm squared $`||\mathcal
 \mathcal{C}_{XY} = \mu_{P_{XY}} - \mu_{P_X}\otimes \mu_{P_Y} = \mathbb{E}\left[(\varphi(X) - \mu_{P_X}) \otimes (\psi(Y) - \mu_{P_Y})\right]
 ```
 
-It is instructive to understand what $`C_{XY}`$ is. The algebraic product of Hilbert Spaces $`\mathcal{H}_\mathcal{X} \otimes \mathcal{H}_\mathcal{Y}`$ is isomorphic to the space of Hilbert-Schmidt operators $`\mathcal{H}_\mathcal{Y} \to \mathcal{H}_\mathcal{X}`$, and under this map $`a\otimes b\mapsto (g\mapsto \langle b, g\rangle a)`$. Therefore, for any functions $`f\in \mathcal{H}_\mathcal{X}, g \in \mathcal{H}_\mathcal{Y}`$:
+It is instructive to understand what $`C_{XY}`$ is. The algebraic product of Hilbert Spaces $`\mathcal{H}_\mathcal{X} \otimes \mathcal{H}_\mathcal{Y}`$ is isomorphic to the space of Hilbert-Schmidt operators $`\mathcal{H}_\mathcal{Y} \to \mathcal{H}_\mathcal{X}`$, and under this isomorphism $`a\otimes b\mapsto (g\mapsto \langle b, g\rangle a)`$. Therefore, for any functions $`f\in \mathcal{H}_\mathcal{X}, g \in \mathcal{H}_\mathcal{Y}`$:
 
 ```math
 \begin{aligned}
@@ -276,7 +279,7 @@ This estimator converges to the population value at a rate of $`O(m^{-1/2})`$. H
 \text{HSIC}_\text{unbiased}(K, L) = \frac{1}{m(m-3)}\left[\text{Tr}(\overline{K}\,\overline{L}) + \frac{\mathbb{1}^\top \overline{K}\mathbb{1}\mathbb{1}^\top \overline{L}\mathbb{1}}{(m-1)(m-2)} - \frac{2}{m-2} \mathbb{1}^\top \overline{K}\overline{L} \mathbb{1}\right]
 ```
 
-where $`\overline{K}, \overline{L}`$ are the kernel matrices $`K, L`$ with diagonal entries set to zero. This is at most an order-$`m^{-2}`$ correction and is negligible (we use $`m=128`$ for experiments). For ease of computation we follow the conventions of Kornblith et al. and use the biased estimator.
+where $`\overline{K}, \overline{L}`$ are the kernel matrices $`K, L`$ with diagonal entries set to zero. This differs from the biased estimator by terms of order-$`m^{-2}`$, and is negligible for our applications (we use $`m=128`$). For ease of computation, we follow the conventions of Kornblith et al. and use the biased estimator.
 
 HSIC allows for generalizations to any kernel of choice, and Kornblith et al. also tried Gaussian RBF, an universal kernel. They showed that linear and gaussian RBF kernels gave similar results and therefore default to the linear kernel, in which case the plug-in estimator reduces to Equation [1](#eq:fncovmat) with $`K = XX^\top`$ and $`L = YY^\top`$ centered.
 
@@ -333,7 +336,7 @@ This study compares SGD, AdamW, and a stable variant of AdamW called Adam-atan2.
 | Implicit Bias on<br> Separable Data<br>(no Weight Decay) | Max $`\ell_2`$-Margin<br>or Direction<br>[Soudry et al. (2018)](https://www.jmlr.org/papers/v19/18-188.html)  | Max $`\ell_\infty`$-Margin<br>or Direction<br>[Zhang et al. (2024)](https://proceedings.neurips.cc/paper_files/paper/2024/hash/2ac79356a03fe5e9250e5e77ebc76e6e-Abstract-Conference.html)  |
 | Limit Point KKT<br>Characterization<br>(with Weight Decay) | $`\ell_2`$-norm<br>Constrained<br>Optimizer<br>  | $`\ell_\infty`$-norm<br>Constrained<br>Optimizer<br>[Xie and Li (2024)](https://arxiv.org/abs/2404.04454)  |
 
-An interesting extension of this study would be to incorporate modern optimizers such as Lion (implicit bias on $`\ell_\infty`$-norm) and Muon (implicit bias on spectral norm), see e.g. [Sfyraki and Wang (2025)](https://arxiv.org/abs/2506.04192). As a dynamical process, optimization algorithms also inject an implicit bias during training in a data and objective-dependent way, see e.g. [Xie, Mohamadi, and Li (2025)](https://proceedings.iclr.cc/paper_files/paper/2025/hash/1700ad4e6252e8f2955909f96367b34d-Abstract-Conference.html).
+An interesting extension of this study would be to incorporate modern optimizers such as Lion (implicit bias on $`\ell_\infty`$-norm) and Muon (implicit bias on spectral norm), see e.g. [Sfyraki and Wang (2025)](https://arxiv.org/abs/2506.04192). As a dynamical process, optimization algorithms also inject an implicit bias during training in a data and objective-dependent way that is not studied in this project, see e.g. [Xie, Mohamadi, and Li (2025)](https://proceedings.iclr.cc/paper_files/paper/2025/hash/1700ad4e6252e8f2955909f96367b34d-Abstract-Conference.html).
 
 #### 2.4.1 AdamW
 
@@ -370,7 +373,7 @@ AdamW, or Adaptive Momentum with Decoupled Weight Decay, is an adaptive momentum
 3. The weight update in line 9 separately applies weight decay $`\lambda\theta_{t-1}`$ from momentum $`\frac{\hat m_t}{\sqrt{\hat v_t} + \epsilon}`$. This distinguishes AdamW from Adam with $`\ell_2`$-regularization, which applies "weight decay" to the gradient in line 4, 
 
 ```math
-g_t \leftarrow \nabla_\theta f(\theta_{t-1}) + \lambda \theta_{t-1}
+g_t \leftarrow \nabla_\theta L(\theta_{t-1}) + \lambda \theta_{t-1}
 ```
 
 </details><br>
@@ -402,7 +405,7 @@ The Adam-atan2 optimizer was proposed in [Everett et al. (2024)](https://arxiv.o
 
 is dominated by noise for wide networks. To fix this issue, Everett et al. propose the alternative update rule
 ```math
-\theta_t \leftarrow \theta_{t-1} - \alpha \left( \arctan\left(\frac{\hat{m}_t}{\sqrt{\hat{v}_t}}\right) + \lambda \theta_{t-1} \right).
+\theta_t \leftarrow \theta_{t-1} - \alpha \left( \frac{4}{\pi}\arctan\left(\frac{\hat{m}_t}{\sqrt{\hat{v}_t}}\right) + \lambda \theta_{t-1} \right).
 ```
 
 <details>
@@ -451,7 +454,7 @@ Thus, we have shown that the limit point of Adam-atan2 in the full-batch setting
 
 #### 2.4.3 SGD
 
-We also analyze the behavior of models trained with Stochastic Gradient Descent (SGD). In contrast to adaptive algorithms, SGD has an implicit bias for max $`\ell_2`$-margin separators in the linear setting. 
+We also analyze the behavior of models trained with Stochastic Gradient Descent (SGD). In contrast to adaptive algorithms, SGD has an implicit bias for large $`\ell_2`$-margin separators in the linear setting. 
 
 <details>
 <summary>Click to view the SGD algorithm</summary>
@@ -467,7 +470,7 @@ We also analyze the behavior of models trained with Stochastic Gradient Descent 
 2.~ t \leftarrow 0 \\
 3.~ \textbf{while } \theta_t\text{ not converged }\\
 4.~ \qquad t \leftarrow t + 1\\
-5.~ \qquad g_t \leftarrow \nabla_\theta f(\theta_{t-1}) + \lambda \theta_{t-1}\\
+5.~ \qquad g_t \leftarrow \nabla_\theta L(\theta_{t-1}) + \lambda \theta_{t-1}\\
 6.~ \qquad v_t \leftarrow \beta v_{t-1} + g_t\\
 7.~ \qquad \tilde{g}_t \gets g_t + \beta v_t\\
 8.~ \qquad \theta_t \leftarrow \theta_{t-1} - \eta_t \tilde{g}_t\\
@@ -480,7 +483,7 @@ We also analyze the behavior of models trained with Stochastic Gradient Descent 
 
 In direct analogy with the KKT-characterization of limit points of adaptive momentum we prove the following stronger theorem:
 
-**Theorem.** Let $`L: \mathbb{R}^d \to \mathbb{R}`$ be a continuously differentiable objective function, $`\beta \in [0,1)`$ the momentum parameter, $`\lambda`$ the weight decay coefficient, $`x_0, v_0 \in \mathbb{R}^d`$ parameter initializations and $`\{\eta_t\}_{t=1}^\infty`$ (not necessarily non-increasing) learning rates such that $`\sum_{t}\eta_t = \infty`$. Consider full-batch GD with weight decay and Nesterov (look-ahead) momentum
+**Theorem.** Let $`L: \mathbb{R}^d \to \mathbb{R}`$ be a continuously differentiable objective function, $`\beta \in [0,1)`$ the momentum parameter, $`\lambda`$ the weight decay coefficient, $`x_0, v_0 \in \mathbb{R}^d`$ parameter initializations and $`\{\eta_t\}_{t=0}^\infty`$ (not necessarily non-increasing) learning schedule such that $`\eta_t \geq 0`$ and $`\sum_{t}\eta_t = \infty`$. Consider full-batch GD with weight decay and Nesterov (look-ahead) momentum
 
 ```math
 \begin{aligned}
@@ -495,9 +498,9 @@ If $`x\to x_\infty`$ converges under this algorithm, then
 
 2. With $`R = ||x_\infty||_2`$, $`x_\infty`$ is a KKT point of the $`\ell_2`$-norm constrained optimization problem
 
-   $$
-   \min_{||x||_2 \leq R} L(x).
-   $$
+    ```math
+    \min_{||x||_2 \leq R} L(x).
+    ```
 
 3. Further, if $`L`$ is convex, $`x_\infty \in \text{argmin}_{||x||_2\leq R}L(x)`$ is a global minimizer.
 
@@ -519,16 +522,16 @@ Given a set $`X = \{x_i\}_{i\in I}`$ of trained models and pairwise "distances" 
 The idea behind both methods is to optimize a loss function, the *strain*, which quantifies the disagreement between the input similarities between points and the realized/reconstructed distance. While MDS uses the similarity scores directly, Isomap additionally accounts for the manifold structure by using the geodesic distance induced by a neighborhood graph generated by the raw similarity scores. Schematically, the strain function for $`\{x_i\}_{i\in I}`$ is given by
 
 ```math
-\text{Strain}(x_1,\dots, x_n) = \left( \frac{\sum_{i,j}(\mu_{ij}-x_i^\top x_j)^2}{\sum_{i,j}\mu_{ij}^2}\right)^{1/2}
+\text{Strain}(x_1,\dots, x_n) = \left(\frac{\sum_{i,j}(\mu_{ij}-x_i^\top x_j)^2}{\sum_{i,j}\mu_{ij}^2}\right)^{1/2}
 ```
 
 #### 2.5.1 Classical Multi-Dimensional Scaling (MDS)
 
 Since CKA and PWCCA compute similarity scores, their complement $`1-\rho`$ is a *dissimilarity* score rather than a distance (they do not satisfy the triangle inequality, and in the case of PWCCA, are not even symmetric). Therefore we use Non-metric Multi-Dimensional Scaling (NMDS), which aims to optimize the objective
 
-$$
+```math
 S(x_1,\dots, x_n; f) = \left(\frac{\sum_{i<j}(f(d_{ij}) - \hat{d}_{ij})^2}{\sum_{i<j}{\hat{d}_{ij}}^2}\right)^{1/2}
-$$
+```
 
 Here $`f`$ is a monotonically-increasing function. NMDS is optimized by iteratively optimizing the two objectives $`\hat f = \text{argmin}_f S(x_1, \dots, x_n; f)`$ and $`\text{argmin}_{\{x_i\}_{i=1}^n} S(x_1,\dots, x_n; \hat f)`$.
 
@@ -559,70 +562,37 @@ Models were trained on the CIFAR-10 dataset with 50000 images split into 40000 i
 
 Models optimized with AdamW, Adam-atan2 were trained for 100 epochs with batch size of 32 with cosine-annealed learning rate and initial learning rate 0.001. The gradient moment hyperparameters were set to $`\beta_{1} = 0.9`$, $`\beta_{2} = 0.999`$ and a weight decay of 0.01 was used. Models optimized with SGD were trained for 200 epochs with batch size 256 again with cosine-annealed learning rate, but with initial learning rate of 0.005. Nesterov momentum was used, with friction coefficient 0.9, as well as weight decay of 0.0005.
 
-Reconstructions of CIFAR-10 test images by the final seed-0 checkpoint of each optimizer are shown below.
-
-<p align="center">
-  <img width="600" alt="cae_reconstructions" src="assets/cae_reconstructions.png" />
-  <br>
-  <em>Reconstructions of CIFAR-10 images (top left) by convolutional autoencoders trained with SGD, AdamW, and Adam-atan2.</em>
-</p>
- 
-
-Ten models per optimizer and parameterization were trained, distinguished by the random seed used for initialization and data-loading order. Theoretical and empirical results suggest that models sharing an optimizer and parameterization should converge to the same mode after accounting for the permutation symmetry of neurons ([Ainsworth et al. (2023)](https://arxiv.org/abs/2209.04836)). In the next section, we present visualizations enabled by MDS which display this phenomenon.
+Ten models per optimizer and parameterization were trained, distinguished by the random seed used for initialization and data-loading order. Theoretical and empirical results suggest that models sharing an optimizer and parameterization should converge to the same mode after accounting for the permutation symmetry of neurons ([Ainsworth et al. (2023)](https://arxiv.org/abs/2209.04836)). In the next section, we present visualizations enabled by MDS which exhibit this phenomenon.
 
 ## 4. Results and Discussion
 
 In this section we present and discuss the main results of the study.
 
-<!-- TODO: MAKE LESS RIGID: this is where people will spend the most time reading -->
-
 ### 4.1 Self-Similarity of a Model During Training
 
 An easy way to organize RSA scores between models is to use a similarity matrix. The $`(i, j)`$-coordinates of a similarity matrix are the layers $`K_{i}`$ of $`K`$ and $`L_{i}`$ of $`L`$, respectively, and the value of the cell at position $`(i,j)`$ are $`\rho(K_{i}, L_{j})`$, where $`\rho`$ is either CKA or PWCCA. As a demonstration, we show the similarity of a model's layers during training versus the final checkpoint.
 
-<p align="center">
-  <figure>
-    <div style="display: flex; gap: 4px; class=figure-group">
-      <figure style="margin: 0; padding: 0;">
-        <img width="150" height="110" src="https://github.com/user-attachments/assets/4e0a6713-5e12-41c1-bc95-e49efee43cd4" alt="adam-atan2_sgd">
-        <figcaption style="text-align: center;">Epoch 0</figcaption>
-      </figure> <figure style="margin: 0; padding: 0;">
-        <img width="150" height="110" src="https://github.com/user-attachments/assets/4e0a6713-5e12-41c1-bc95-e49efee43cd4" alt="adam-atan2_sgd">
-        <figcaption style="text-align: center;">Epoch 30</figcaption>
-      </figure> <figure style="margin: 0; padding: 0;">
-        <img width="150" height="110" src="https://github.com/user-attachments/assets/4e0a6713-5e12-41c1-bc95-e49efee43cd4" alt="adam-atan2_sgd">
-        <figcaption style="text-align: center;">Epoch 60</figcaption>
-      </figure> <figure style="margin: 0; padding: 0;">
-        <img width="150" height="110" src="https://github.com/user-attachments/assets/4e0a6713-5e12-41c1-bc95-e49efee43cd4" alt="adam-atan2_sgd">
-        <figcaption style="text-align: center;">Epoch 90</figcaption>
-      </figure> <figure style="margin: 0; padding: 0;">
-        <img width="150" height="110" src="https://github.com/user-attachments/assets/4e0a6713-5e12-41c1-bc95-e49efee43cd4" alt="adam-atan2_sgd">
-        <figcaption style="text-align: center;">Epoch 100</figcaption>
-      </figure>
-    </div>
-    <figcaption style="text-align: center;"><em>Figure 2: CKA similarity of layers of a model trained with Adam-atan2 at each epoch versus at the end of training.</em></figcaption>
-  </figure>
-</p>
+<table align="center">
+  <tr>
+    <td align="center"><img src="assets/trainmode_opA_adam_atan2_0_opB_adam_atan2_0_cka_0_v_final.png" width="160"><br><sub>Epoch 0</sub></td>
+    <td align="center"><img src="assets/trainmode_opA_adam_atan2_0_opB_adam_atan2_0_cka_30_v_final.png" width="160"><br><sub>Epoch 30</sub></td>
+    <td align="center"><img src="assets/trainmode_opA_adam_atan2_0_opB_adam_atan2_0_cka_60_v_final.png" width="160"><br><sub>Epoch 60</sub></td>
+    <td align="center"><img src="assets/trainmode_opA_adam_atan2_0_opB_adam_atan2_0_cka_90_v_final.png" width="160"><br><sub>Epoch 90</sub></td>
+    <td align="center"><img src="assets/trainmode_opA_adam_atan2_0_opB_adam_atan2_0_cka_100_v_final.png" width="160"><br><sub>Epoch 100</sub></td>
+  </tr>
+</table>
+<p align="center"><em>ayerwise CKA similarity of a model trained with Adam-atan2 at each epoch versus at the end of training.</em></p>
 
 The values on the diagonal of this matrix converge to unity because every layer of the model is exactly self-similar. It is also interesting to compare RSA similarities of layers of models trained with different optimizers:
 
-<p align="center">
-  <figure>
-    <div style="display: flex; gap: 4px; class=figure-group">
-      <figure style="margin: 0; padding: 0;">
-        <img width="200" height="150" src="https://github.com/user-attachments/assets/4e0a6713-5e12-41c1-bc95-e49efee43cd4" alt="adamw_sgd">
-        <figcaption style="text-align: center;">(a) AdamW versus SGD</figcaption>
-      </figure> <figure style="margin: 0; padding: 0;">
-        <img width="200" height="150" src="https://github.com/user-attachments/assets/4e0a6713-5e12-41c1-bc95-e49efee43cd4" alt="adam-atan2_sgd">
-        <figcaption style="text-align: center;">(b) Adam-atan2 versus SGD</figcaption>
-      </figure> <figure style="margin: 0; padding: ;">
-        <img width="200" height="150" src="https://github.com/user-attachments/assets/4e0a6713-5e12-41c1-bc95-e49efee43cd4" alt="adam-atan2_adamw" width="300">
-        <figcaption style="text-align: center;">(c) Adam-atan2 versus AdamW</figcaption>
-      </figure>
-    </div>
-    <figcaption style="text-align: center;"><em>Figure 3: CKA similarity between models trained using different optimizers.</em></figcaption>
-  </figure>
-</p>
+<table align="center">
+  <tr>
+    <td align="center"><img src="assets/trainmode_opA_adam_atan2_0_opB_adamw_5_cka_final.png" width="280"><br><sub>(a) Adam-atan2 ($x$) vs. AdamW ($y$)</sub></td>
+    <td align="center"><img src="assets/trainmode_opA_adam_atan2_0_opB_sgd_5_cka_final.png" width="280"><br><sub>(b) Adam-atan2 ($x$) vs. SGD ($y$)</sub></td>
+    <td align="center"><img src="assets/assets/trainmode_opA_adamw_0_opB_sgd_5_cka_final.png" width="280"><br><sub>(c) AdamW ($x$) vs. SGD ($y$)</sub></td>
+  </tr>
+</table>
+<p align="center"><em>Layerwise CKA similarity between models trained using different optimizers.</em></p>
 
 ### 4.2 Optimizer Implicit Bias Guides Feature Learning
 
@@ -630,9 +600,27 @@ We plot the similarity between layers trained using different optimizers as a fu
 
 FIGURES: plot_1_cka_adamw_adam_atan2, plot_1_cka_sgd_adam_atan2, plot_1_cka_sgd_adamw
 
-Comparing models trained with SGD versus adaptive algorithms, we see that their RSA scores diverge over the course of training, with deeper layers drifting further than shallower ones. By contrast, the RSA score between representations learned with AdamW and Adam-atan2 do not display a discernable pattern. We see a similar pattern when measuring similarity using PWCCA, though the plot shows much more variability in early stages of training:
+<table align="center">
+  <tr>
+    <td align="center"><img src="assets/plot_1_cka_adamw_adam_atan2.png" width="280"><br><sub>(a) AdamW vs. Adam-atan2</sub></td>
+    <td align="center"><img src="assets/plot_1_cka_sgd_adam_atan2.png" width="280"><br><sub>(b) SGD vs. Adam-atan2</sub></td>
+    <td align="center"><img src="assets/plot_1_cka_sgd_adamw.png" width="280"><br><sub>(c) SGD vs. AdamW</sub></td>
+  </tr>
+</table>
+<p align="center"><em>CKA similarity between layers of models trained with different optimizers as a function of training epoch.</em></p>
 
-FIGURES: plot_1_pwcca_adamw_adam_atan2, plot_1_pwcca_sgd_adam_atan2, plot_1_pwcca_sgd_adamw
+Comparing models trained with SGD versus adaptive algorithms, we see that their RSA scores diverge over the course of training, with deeper layers drifting further than shallower ones. By contrast, the RSA score between representations learned with AdamW and Adam-atan2 do not display a discernible pattern. We see a similar pattern when measuring similarity using PWCCA, though the plot shows much more variability in early stages of training:
+
+FIGURES: plot_1_pwcca_adam_atan2_adamw, plot_1_pwcca_sgd_adam_atan2, plot_1_pwcca_sgd_adamw
+
+<table align="center">
+  <tr>
+    <td align="center"><img src="assets/plot_1_pwcca_adam_atan2_adamw.png" width="280"><br><sub>(a) AdamW vs. Adam-atan2</sub></td>
+    <td align="center"><img src="assets/plot_1_pwcca_sgd_adam_atan2.png" width="280"><br><sub>(b) SGD vs. Adam-atan2</sub></td>
+    <td align="center"><img src="assets/plot_1_pwcca_sgd_adamw.png" width="280"><br><sub>(c) SGD vs. AdamW</sub></td>
+  </tr>
+</table>
+<p align="center"><em>PWCCA similarity between layers of models trained with different optimizers as a function of training epoch.</em></p>
 
 Deep vision models learn a hierarchy of features: neurons in shallow layers are associated with low-level features while neurons in deeper layers are associated with higher-level ones. Thus, there are two possibilities that we can think of which explain our results:
 
@@ -646,25 +634,57 @@ The former explanation suggests a difference in learned features based on optimi
 
 We plot the RSA self-similarity scores of layers during training versus at their final state, for models trained with AdamW, Adam-atan2, and SGD.
 
-FIGURE: plot_2_cka_sgd, plot_2_cka_adamw, plot_2_cka_adam-atan2
+FIGURE: plot_2_cka_sgd, plot_2_cka_adamw, plot_2_cka_adam_atan2
 
-The results show a qualitative difference in the way layers converge to their final checkpoints depending on the optimizer used in training. Paying close attention to the difference in scale of the $`y`$-axis, we see that the main difference between SGD and adaptive momentum is that the deeper layers are learned much faster for Adam, at a rate comparable to shallow layers. By contrast, weights optimized with SGD appear to be learn "bottom-up" with shallower layers converging to their final features at the Adam rate while deeper ones do so only after shallow layers have stabilized. This means that Adam enjoys better sample efficiency when training on this task of image compression and reconstruction. Combined with the results of [Xie, Mohamadi, and Li (2025)](https://openreview.net/forum?id=PUnD86UEK5), this suggests that the loss landscape of the task at hand is characterized by $`\ell_\infty`$-smoothness, rather than $`\ell_2`$-smoothness.
+<table align="center">
+  <tr>
+    <td align="center"><img src="assets/plot_2_cka_sgd.png" width="280"><br><sub>(a) SGD</sub></td>
+    <td align="center"><img src="assets/plot_2_cka_adamw.png" width="280"><br><sub>(b) AdamW</sub></td>
+    <td align="center"><img src="assets/plot_2_cka_adam_atan2.png" width="280"><br><sub>(c) Adam-atan2</sub></td>
+  </tr>
+</table>
+<p align="center"><em>CKA self-similarity of layers during training versus their final state.</em></p>
+
+The results show a qualitative difference in the way layers converge to their final checkpoints depending on the optimizer used in training. Paying close attention to the difference in scale of the $`y`$-axis, we see that the main difference between SGD and adaptive momentum is that the deeper layers are learned much faster for Adam, at a rate comparable to shallow layers. By contrast, weights optimized with SGD appear to be learned "bottom-up" with shallower layers converging to their final features at the Adam rate while deeper ones do so only after shallow layers have stabilized. This means that Adam enjoys better sample efficiency when training on this task of image compression and reconstruction. Combined with the results of [Xie, Mohamadi, and Li (2025)](https://openreview.net/forum?id=PUnD86UEK5), this suggests that the loss landscape of the task at hand is characterized by $`\ell_\infty`$-smoothness, rather than $`\ell_2`$-smoothness.
 
 Now consider the same figures, but with similarities calculated by PWCCA:
 
-FIGURE: plot_2_pwcca_sgd, plot_2_pwcca_adamw, plot_2_pwcca_adam-atan2
+FIGURE: plot_2_pwcca_sgd, plot_2_pwcca_adamw, plot_2_pwcca_adam_atan2
+
+<table align="center">
+  <tr>
+    <td align="center"><img src="assets/plot_2_pwcca_sgd.png" width="280"><br><sub>(a) SGD</sub></td>
+    <td align="center"><img src="assets/plot_2_pwcca_adamw.png" width="280"><br><sub>(b) AdamW</sub></td>
+    <td align="center"><img src="assets/plot_2_pwcca_adam_atan2.png" width="280"><br><sub>(c) Adam-atan2</sub></td>
+  </tr>
+</table>
+<p align="center"><em>PWCCA self-similarity of layers during training versus their final state.</em></p>
 
 We see that the differences between SGD and adaptive methods disappear! So is the aforementioned phenomenon present or not? To answer this question, we performed a study to understand the sample efficiency of PWCCA and CKA. With fixed weights, we computed the PWCCA and CKA scores of AdamW versus SGD-optimized models using different number of samples $`m`$, i.e. so the activation vector takes the form $`[z_1^{(\ell)}, z_2^{(\ell)},\dots, z_m^{(\ell)}]`$. We then plotted the scores as a function of $`m`$:
 
 FIGURE: probeset_resolution_adamw_sgd_cka, probeset_resolution_adamw_sgd_pwcca
 
-The pre-activation for each layer was computed for three different i.i.d. draws from the test set and the RSA scores were averaged over the results; the bands represent 95% CIs for each line. For both similarity measures, the variance of RSA scores decreased as a function of samples used to compute pre-activations. However, while CKA scores began stabilizing to their asymptotic values around $`m = 16`$ samples, PWCCA scores continued to increase beyond $`m=512`$. More importantly, the rank-order of PWCCA similarity changes as a function of $`m`$, indicating that PWCCA is not a reliable measure of feature similarity in our use case. This gives credence over our initial observation that Adam does indeed have an advantage over SGD.
+<table align="center">
+  <tr>
+    <td align="center"><img src="assets/probeset_resolution_adamw_sgd_cka.png" width="400"><br><sub>(a) CKA</sub></td>
+    <td align="center"><img src="assets/probeset_resolution_adamw_sgd_pwcca.png" width="400"><br><sub>(b) PWCCA</sub></td>
+  </tr>
+</table>
+<p align="center"><em>RSA scores between AdamW- and SGD-trained models as a function of the number of samples $m$. Bands are 95\% CIs over three i.i.d.\ draws from the test set.</em></p>
+
+The pre-activation for each layer was computed for three different i.i.d. draws from the test set and the RSA scores were averaged over the results; the bands represent 95% CIs for each line. For both similarity measures, the variance of RSA scores decreased as a function of samples used to compute pre-activations. However, while CKA scores began stabilizing to their asymptotic values around $`m = 16`$ samples, PWCCA scores continued to increase beyond $`m=512`$. More importantly, the rank-order of PWCCA similarity changes as a function of $`m`$, indicating that PWCCA is not a reliable measure of feature similarity in our use case. This gives credence to our initial observation that Adam does indeed have an advantage over SGD.
 
 ### 4.4 Optimization Affects the Final Location of Models in Representation Space
 
 For each optimizer $`\in \{\text{SGD}, \text{AdamW}, \text{Adam-atan2}\}`$, we train ten models with different random initializations and data-loading order. We then compute the (banded mean diagonal) aggregate dissimilarity scores (see [above](#23-aggregate-model-to-model-metrics)) for every pair of models among the thirty models. We then optimized non-metric MDS and Isomap visualization algorithms with input the aggregate RSA-dissimilarity scores to obtain the following low-dimensional representations of model space.
 
 FIGURE: plot_4_BDS_mds
+
+<p align="center">
+  <img src="assets/plot_4_BDS_mds.png" width="500" alt="MDS embedding (BDD)">
+  <br>
+  <em>Non-metric MDS embedding of the thirty trained models using banded diagonal dissimilarity.</em>
+</p>
 
 The $`n`$-dimensional coordinates $`(x_1,\dots, x_n)`$ of the embedding $`x`$ of a point are ordered by their variance/importance from greatest to least. Therefore, MDS visualization shows that models trained with SGD are very distinct from those trained with adaptive momentum: the separation in the $`x`$-axis implies that the variance in feature dissimilarity can be best explained by the different optimizers.
 
@@ -674,17 +694,37 @@ This conclusion is supported by plotting the aggregate similarity between models
 
 FIGURE: plot_3_BDS_cka_sgd_adamw
 
-The Isomap visualization shows a different characterization of the loss landscape. The models trained with adaptive optimizers are no longer well-separated, though the models trained with adaptive optimizers and SGD can still be distinguished by a simple elliptical boundary. Given the drastically different views of the same space, it is interesting to wonder what the true geometry of the high-dimensional generalization basin is.
+<p align="center">
+  <img src="assets/plot_3_BDS_cka_sgd_adamw.png" width="500" alt="MDS embedding (BDD)">
+  <br>
+  <em>Aggregate CKA similarity between models as a function of training epoch.</em>
+</p>
+
+The Isomap visualization shows a different characterization of the loss landscape. The models trained with adaptive optimizers are no longer well-separated, though the models trained with adaptive optimizers and SGD can still be distinguished by a simple elliptical boundary.
 
 FIGURE: plot_4_BDS_isomap
+
+<p align="center">
+  <img src="assets/plot_4_BDS_isomap.png" width="500" alt="MDS embedding (BDD)">
+  <br>
+  <em>Isomap embedding of the thirty trained models using banded diagonal dissimilarity.</em>
+</p>
 
 The previous visualizations used banded diagonal dissimilarity (BDD) as the non-metric score for MDS and Isomap. We found that when using Mean Diagonal Dissimilarity (MDD) there were outlier points far from the main cluster (note the scale on the axes). We attribute these outlier points as having learned features in a layer which is offset as compared to most of the other models.
 
 FIGURE (MDS + Isomap, MDD)
 
+<table align="center">
+  <tr>
+    <td align="center"><img src="assets/plot_4_MDS_mds.png" width="400"><br><sub>(a) MDS</sub></td>
+    <td align="center"><img src="assets/plot_4_MDS_isomap.png" width="400"><br><sub>(b) Isomap</sub></td>
+  </tr>
+</table>
+<p align="center"><em>MDS and Isomap embeddings using mean diagonal dissimilarity (MDD).</em></p>
+
 ### 4.5 Limitations
 
-In this section we discuss limitations of our study. The first is the disagreement between the results of CKA and PWCCA. As discussed earlier in section [4.3](#43-optimization-affects-how-uniformly-representations-converge), PWCCA becomes unreliable at low number of samples. This is largely due to its algorithm: when $`m < \max(d_1, d_2)`$ the matrix $`K`$ in the CCA algorithm is singular, with $`K`$ gaining more zero eigenvalues as $`m`$ decreases. This effectively cuts off the number of possible canonical directions and puts an upper bound on PWCCA score. To achieve a true empirical estimate of PWCCA similarity one must choose $`m`$ to be larger than $`d_1, d_2`$, but in this case the files containing activation data becomes inhibitively large (we use a moderate number $`m=128`$ of samples). For this reason it is common nowadays to use other RSA measures such as CKA or Orthogonal Procrustes which can be robustly estimated with much fewer samples.
+In this section we discuss limitations of our study. The first is the disagreement between the results of CKA and PWCCA. As discussed earlier in section [4.3](#43-optimization-affects-how-uniformly-representations-converge), PWCCA becomes unreliable at low number of samples. This is largely due to its algorithm: when $`m < \max(d_1, d_2)`$ the matrix $`K`$ in the CCA algorithm is singular, with $`K`$ gaining more zero eigenvalues as $`m`$ decreases. This effectively cuts off the number of possible canonical directions and puts an upper bound on PWCCA score. To achieve a true empirical estimate of PWCCA similarity one must choose $`m`$ to be larger than $`d_1, d_2`$, but in this case the files containing activation data becomes prohibitively large (we use a moderate number $`m=128`$ of samples). For this reason it is common nowadays to use other RSA measures such as CKA or Orthogonal Procrustes which can be robustly estimated with much fewer samples.
 
 In estimating CKA, we have used the biased (V-statistic) estimator which is computationally light but biased for small sample sizes. This is related to the fact that terms like $`\mathbb{E}k(X, X')`$ in $`\text{MMD}^2`$ requires independent draws $`X, X'`$ from the underlying distribution. The bias correction is of order $`m^{-2}`$ for $`m`$ samples and is negligible for our experiments.
 
@@ -696,9 +736,9 @@ Although PWCCA and CKA are commonly used in the RSA literature in both machine l
 
 ## 5. Summary and Future Work
 
-In this project we studied the effect of optimization on the training dynamics of deep neural networks trained on a real image dataset from the viewpoint of representational similarity analysis (RSA). We observe phenomena consistent with theoretical results from statistical learning theory: optimizer implicit bias plays an important role in determining the final location of a trained model in the loss landscape. The novelty of our approach is using RSA analysis to arrive at this conclusion. To study this relationship, we first extended theoretical results on the implicit bias of optimizers to Adam-atan2 and batch GD with Nesterov momentum. We performed ablation studies by fixing the model architecture and dataset while varying initializations and data-loading orders across a fixed set of random seeds. Finally, we measured the similarity of trained models using the CKA and PWCCA scores.
+In this project we studied the effect of optimization on the training dynamics of deep neural networks trained on a real image dataset from the viewpoint of representational similarity analysis (RSA). We observe that optimizer implicit bias plays an important role in determining the final location of a trained model in the loss landscape, consistent with statistical learning theory. The novelty of our approach is using RSA analysis to arrive at this conclusion. To study this relationship, we first extended theoretical results on the implicit bias of optimizers to Adam-atan2 and batch GD with Nesterov momentum. We performed ablation studies by fixing the model architecture and dataset while varying initializations and data-loading orders across a fixed set of random seeds. Finally, we measured the similarity of trained models using the CKA and PWCCA scores.
 
-It has been [recently observed](https://proceedings.iclr.cc/paper_files/paper/2026/hash/c3596a5990c2cddb0b0de478df7aca65-Abstract-Conference.html) that per-sample adaptive momentum optimizers, perhaps unexpectedly, have an implicit bias towards large $`\ell_{2}`$-margin separators on separable data instead of the expected $`\ell_{\infty}`$-margin for models in the full-batch setting. If this is true, then what we assumed about the implicit bias of AdamW and Adam-atan2 may not apply here. To be sure, one must study the phase transition of implicit bias a function of batch size. It would be interesting to understand how small-batch Adam relates to SGD, which has implicit bias for hard $`\ell_{2}`$-margin separators in linear settings. It would also be interesting to extend our analysis to include other optimization algorithms such as [Muon](https://kellerjordan.github.io/posts/muon/), [Shampoo](https://scholar.google.com/scholar_lookup?arxiv_id=1802.09568), and [Lion](https://proceedings.iclr.cc/paper_files/paper/2024/hash/986e0caad271b59417287737416d8594-Abstract-Conference.html), all of which have [many](https://proceedings.neurips.cc/paper_files/paper/2025/hash/386432c7534eec9a1cd7cbeea90d7e9f-Abstract-Conference.html) [novel](https://arxiv.org/abs/2602.01105) [theoretical](https://arxiv.org/abs/2506.04192v2) [results](https://www.jmlr.org/papers/v27/25-0634.html) characterizing their implicit biases.
+It has been [recently observed](https://proceedings.iclr.cc/paper_files/paper/2026/hash/c3596a5990c2cddb0b0de478df7aca65-Abstract-Conference.html) that per-sample adaptive momentum optimizers, perhaps unexpectedly, have an implicit bias towards large $`\ell_{2}`$-margin separators on separable data instead of the expected $`\ell_{\infty}`$-margin for models in the full-batch setting. If this is true, then what we assumed about the implicit bias of AdamW and Adam-atan2 may not apply here. To be sure, one must study the phase transition of implicit bias as a function of batch size. It would be interesting to understand how small-batch Adam relates to SGD, which has implicit bias for hard $`\ell_{2}`$-margin separators in linear settings. It would also be interesting to extend our analysis to include other optimization algorithms such as [Muon](https://kellerjordan.github.io/posts/muon/), [Shampoo](https://scholar.google.com/scholar_lookup?arxiv_id=1802.09568), and [Lion](https://proceedings.iclr.cc/paper_files/paper/2024/hash/986e0caad271b59417287737416d8594-Abstract-Conference.html), all of which have [many](https://proceedings.neurips.cc/paper_files/paper/2025/hash/386432c7534eec9a1cd7cbeea90d7e9f-Abstract-Conference.html) [novel](https://arxiv.org/abs/2602.01105) [theoretical](https://arxiv.org/abs/2506.04192v2) [results](https://www.jmlr.org/papers/v27/25-0634.html) characterizing their implicit biases.
 
 Finally, it is interesting to wonder how our results, and more generally the science of RSA and interpretability, helps explain the nature of generalization in large language model pretraining and fine-tuning. The success of multi-modal models suggests a sort of [vision-language convergence](https://arxiv.org/abs/2405.07987), though this position is hotly debated. We point out just one potential application for "representation engineering." Just as RSA [enables](https://openaccess.thecvf.com/content_ICCV_2019/html/Tung_Similarity-Preserving_Knowledge_Distillation_ICCV_2019_paper.html) the distillation of high-capacity teachers into more compute-efficient students, applying similar representation-matching techniques could help steer models towards safer and more useful behavior.
 
