@@ -1,10 +1,10 @@
 # Proofs
 
-This page contains the proofs of the theoretical results stated in Section 2.4 of the [README](README.md#24-optimizers). They are kept on a separate page because GitHub stops rendering mathematical expressions beyond a certain number per page.
+This page contains the proofs of the theoretical results stated in Section 2.4 of the [README](README.md#24-optimizers).
 
 ## 1. Implicit Bias of AdamW
 
-**Theorem.** (*Xie and Li 2024, Theorem 1.1*) For any continuously differentiable objective function $`L: \mathbb{R}^d \to \mathbb{R}`$, $`\beta_1\leq \beta_2 < 1`$, initialization $`x_0`$ and non-increasing learning rate $`\{\eta_t\}_{t=1}^\infty`$ such that $`\sum_{t}\eta_t = \infty`$, if the iterates of AdamW on $`L`$ converge to some $`x_\infty`$, then $`x_\infty`$ is a KKT point of the constrained optimization problem
+**Theorem.** (*Xie and Li 2024, Theorem 1.1*) For any continuously differentiable objective function $`L: \mathbb{R}^d \to \mathbb{R}`$, $`\beta_1\leq \beta_2 \lt 1`$, initialization $`x_0`$ and non-increasing learning rate $`\{\eta_t\}_{t=1}^\infty`$ such that $`\sum_{t}\eta_t = \infty`$, if the iterates of AdamW on $`L`$ converge to some $`x_\infty`$, then $`x_\infty`$ is a KKT point of the constrained optimization problem
 
 ```math
 \min_{||x||_\infty \leq 1/\lambda} L(x).
@@ -84,7 +84,7 @@ or $`-\nabla L(x^{\ast}) \in \mu \partial ||x^{\ast}||_\infty`$. Since $`\mu\par
 
 Expand on the cases of primal feasibility:
 
-- $`x^{\ast}`$ is an interior point ($`||x^{\ast}||_\infty < 1/\lambda`$): by complementary slackness, $`\mu^{\ast} = 0`$, which implies $`\nabla L(x^{\ast}) = 0`$.
+- $`x^{\ast}`$ is an interior point ($`||x^{\ast}||_\infty \lt 1/\lambda`$): by complementary slackness, $`\mu^{\ast} = 0`$, which implies $`\nabla L(x^{\ast}) = 0`$.
 - $`x^{\ast}`$ is a boundary point ($`||x^{\ast}||_\infty = 1/\lambda`$): the minimal value of $`\mu`$ required to satisfy stationarity is $`\mu = ||\nabla L(x^{\ast})||_1`$.
 
 In both cases, it's true that for a KKT point $`(x^{\ast}, \mu^{\ast})`$:
@@ -98,7 +98,7 @@ The reverse direction follows by choosing $`\mu^{\ast} = ||\nabla L(x^{\ast})||_
 ||\nabla L(x^{\ast})||_1 = \langle -\lambda x^{\ast}, \nabla L(x^{\ast})\rangle \leq ||\lambda x^{\ast}||_\infty\cdot ||\nabla L(x^{\ast})||_1 \leq ||\nabla L(x^{\ast})||_1.
 ```
 
-Therefore both inequalities are equalities. Dividing through by $`||\nabla L(x^{\ast})||_1 > 0`$ gives $`||\lambda x^{\ast}||_\infty = 1`$, so
+Therefore both inequalities are equalities. Dividing through by $`||\nabla L(x^{\ast})||_1 \gt 0`$ gives $`||\lambda x^{\ast}||_\infty = 1`$, so
 
 ```math
 \mu^{\ast} \left( ||x^{\ast}||_\infty - \frac{1}{\lambda}\right) = 0.
@@ -124,7 +124,7 @@ We now finish the proof sketch of Theorem 1.1 by proving that the limit point $`
 \frac{1}{S_T} \sum_{t\leq T} \eta_t a_t \to a.
 ```
 
-*Proof.* Given $`\epsilon > 0`$, pick $`t'`$ such that $`||a_t - a||\leq \epsilon`$ for all $`t > t'`$. Then by the triangle inequality,
+*Proof.* Given $`\epsilon \gt 0`$, pick $`t'`$ such that $`||a_t - a||\leq \epsilon`$ for all $`t \gt t'`$. Then by the triangle inequality,
 
 ```math
 \left|\left|\frac{1}{S_T} \sum_{t\leq T} \eta_t(a_t - a)\right|\right| \leq \frac{1}{S_T}\sum_{t\leq T} \eta_t ||a_t - a|| \leq \frac{1}{S_T}\sum_{t\leq t'} \eta_t ||a_t - a|| + \epsilon.
@@ -177,23 +177,23 @@ It remains to prove that $`\overline{\Delta}_{t, i}\leq 1`$ as $`t\to\infty`$ in
 **Lemma.** For non-increasing learning schedule $`\eta_t`$ and every $`j\geq 1`$, $`T \geq j + 1`$,
 
 ```math
-\sum_{t = j+1}^T \eta_t(L_t - L_{t-j}) \leq C_j := \eta_1\left( s_0 \max_{s < s_0} |L_s| + \frac{j^2}{2}|\log \beta_2| \right).
+\sum_{t = j+1}^T \eta_t(L_t - L_{t-j}) \leq C_j := \eta_1\left( s_0 \max_{s \lt s_0} |L_s| + \frac{j^2}{2}|\log \beta_2| \right).
 ```
 
-*Proof.* We proceed in two cases: (1) if $`T\geq 2j`$ and (2) if $`j+1\leq T< 2j`$. Let $`s = t-j`$.
+*Proof.* We proceed in two cases: (1) if $`T\geq 2j`$ and (2) if $`j+1\leq T \lt 2j`$. Let $`s = t-j`$.
 
 For case 1, we can write the LHS as
 ```math
 \sum_{t = j+1}^T \eta_t L_t - \sum_{s=1}^{T-j} \eta_{s+j}L_s = \sum_{s=j+1}^{T-j}(\eta_s - \eta_{s+j}) L_s + \sum_{s=T-j+1}^T \eta_s L_s - \sum_{s=1}^j \eta_{s+j}L_s
 ```
 
-Contributions to the first two terms run over disjoint indices $`s`$ and moreover $`L_s > 0`$ only if $`s < s_0`$. Since $`0\leq \eta_s - \eta_{s+j} \leq \eta_s \leq \eta_1`$, their sum is therefore bounded by $`\eta_1 s_0 \max_{s<s_0} |L_s|`$. The third term is bounded above by
+Contributions to the first two terms run over disjoint indices $`s`$ and moreover $`L_s \gt 0`$ only if $`s \lt s_0`$. Since $`0\leq \eta_s - \eta_{s+j} \leq \eta_s \leq \eta_1`$, their sum is therefore bounded by $`\eta_1 s_0 \max_{s \lt s_0} |L_s|`$. The third term is bounded above by
 
 ```math
 - \sum_{s=1}^j \eta_{s+j}L_s \leq \eta_1 |\log\beta_2| \sum_{s=1}^j (s-1) \leq \eta_1 |\log\beta_2| \frac{j^2}{2}.
 ```
 
-For case 2, we bound the LHS directly: $`\sum_{t=j+1}^{T}\eta_t L_t \leq \eta_1 s_0 \max_{s<s_0}|L_s|`$ and in this range $`T-j < j`$, so
+For case 2, we bound the LHS directly: $`\sum_{t=j+1}^{T}\eta_t L_t \leq \eta_1 s_0 \max_{s \lt s_0}|L_s|`$ and in this range $`T-j \lt j`$, so
 
 ```math
 - \sum_{s=1}^{T-j} \eta_{s+j}L_s \leq \eta_1 |\log \beta_2| \sum_{s=1}^{T-j} (s-1) \leq \eta_1 |\log\beta_2|\frac{j^2}{2}. \qquad\Box
@@ -211,7 +211,7 @@ It follows that
 \Delta_t^2 = \frac{m_t^2}{v_t} \leq \frac{1-\beta_1}{1-\beta_2} \left(\frac{\sum_{j=0}^t\beta_1^j g_{t-j}^2}{v_t/(1-\beta_2)}\right).
 ```
 
-The bracketed quantity is a ratio of exponential moving averages with memory $`\beta_1\leq \beta_2`$. If $`g^2`$ is constant, this ratio equals unity. If $`g^2`$ is shrinking or growing, then the ratio is $`<1`$ or $`>1`$, respectively, since the most recent values dominate. Since $`g`$ is unbounded, no pointwise bound for $`\Delta_t`$ exists. The point is that no asymptotically-vanishing sequence $`g_t`$ increases on average, so a bound on $`\overline{\Delta}_t`$ is possible. 
+The bracketed quantity is a ratio of exponential moving averages with memory $`\beta_1\leq \beta_2`$. If $`g^2`$ is constant, this ratio equals unity. If $`g^2`$ is shrinking or growing, then the ratio is $`\lt 1`$ or $`\gt 1`$, respectively, since the most recent values dominate. Since $`g`$ is unbounded, no pointwise bound for $`\Delta_t`$ exists. The point is that no asymptotically-vanishing sequence $`g_t`$ increases on average, so a bound on $`\overline{\Delta}_t`$ is possible. 
 
 It is convenient to define $`m_s, v_s, g_s = 0`$ for $`s \leq 0`$. By definition $`g_s^2 = (v_s - \beta_2 v_{s-1})/(1 - \beta_2)`$, so
 
@@ -236,7 +236,7 @@ Using the identities $`(1-\beta_1)/(1-\beta_2) = 1 + (\beta_2 - \beta_1)/(1-\bet
 \Delta_t^2 \leq 1 + \frac{(\beta_2 - \beta_1)(1-\beta_1)}{1-\beta_2} \sum_{j\geq 1} \beta_1^{j-1} \left(1 - \frac{v_{t-j}}{v_t}\right) = 1 + \frac{\beta_2 - \beta_1}{1-\beta_2}\left(\beta_1^{t-1} + (1-\beta_1)\sum_{j=1}^{t-1}\beta_1^{j-1}\left(1 - \frac{v_{t-j}}{v_t}\right)\right)
 ```
 
-Since $`1-x \leq -\log x`$ for $`x > 0`$, $`1- (v_{t-j}/v_t) \leq L_t - L_{t-j}`$, and we get
+Since $`1-x \leq -\log x`$ for $`x \gt 0`$, $`1- (v_{t-j}/v_t) \leq L_t - L_{t-j}`$, and we get
 
 ```math
 \Delta_t^2\leq 1 + \frac{\beta_2 - \beta_1}{1-\beta_2}\left(\beta_1^{t-1} + (1 - \beta_1)\sum_{j=1}^{t-1}\beta_1^{j-1}(L_t - L_{t-j})\right)
@@ -254,7 +254,7 @@ The double sum is over lattice points within a triangle. The same domain has an 
 \sum_{t\leq T}\eta_t\Delta_t^2 \leq S_T + \frac{\beta_2-\beta_1}{1-\beta_2}\left(\frac{\eta_1}{1-\beta_1} + (1-\beta_1)\sum_{j=1}^{T-1}\beta_1^{j-1}C_j \right)
 ```
 
-Now $`C_j = O(j^2)`$, so $`\sum_{j=1}^{T-1}\beta_1^{j-1}C_j \leq C\int_1^T\text{d}t~\beta_1^{t-1} t^2`$ and is manifestly finite for $`\beta_1 < 1`$. In the limit that $`T\to\infty`$, the integral can be evaluated exactly to give $`\Gamma(3, -\log \beta_1)/(\beta_1(-\log\beta_1)^3) < \infty`$. It follows that by Jensen's inequality,
+Now $`C_j = O(j^2)`$, so $`\sum_{j=1}^{T-1}\beta_1^{j-1}C_j \leq C\int_1^T\text{d}t~\beta_1^{t-1} t^2`$ and is manifestly finite for $`\beta_1 \lt 1`$. In the limit that $`T\to\infty`$, the integral can be evaluated exactly to give $`\Gamma(3, -\log \beta_1)/(\beta_1(-\log\beta_1)^3) \lt \infty`$. It follows that by Jensen's inequality,
 ```math
 \overline{\Delta}_T^2 \leq \frac{1}{S_T}\sum_{t\leq T}\eta_t \Delta_t^2 \leq 1 + \frac{O(1)}{S_T}.
 ```
@@ -263,7 +263,7 @@ Since this is true for every component $`i`$ of $`\overline{\Delta}_T`$, it foll
 
 ## 2. Implicit Bias of Adam-atan2
 
-**Corollary.** (Implicit Bias of Adam-atan2 in Full Batch Setting) For any continuously differentiable objective function $`L: \mathbb{R}^d \to \mathbb{R}`$, $`\beta_1\leq \beta_2 < 1`$, initialization $`x_0`$ and non-increasing learning rate $`\{\eta_t\}_{t=1}^\infty`$ such that $`\sum_{t}\eta_t = \infty`$, if the iterates of Adam-atan2 on $`L`$ converge to some $`x_\infty`$, then $`x_\infty`$ is a KKT point of the constrained optimization problem
+**Corollary.** (Implicit Bias of Adam-atan2 in Full Batch Setting) For any continuously differentiable objective function $`L: \mathbb{R}^d \to \mathbb{R}`$, $`\beta_1\leq \beta_2 \lt 1`$, initialization $`x_0`$ and non-increasing learning rate $`\{\eta_t\}_{t=1}^\infty`$ such that $`\sum_{t}\eta_t = \infty`$, if the iterates of Adam-atan2 on $`L`$ converge to some $`x_\infty`$, then $`x_\infty`$ is a KKT point of the constrained optimization problem
 
 ```math
 \min_{||x||_\infty \leq 1/\lambda} L(x).
@@ -284,10 +284,10 @@ We continue off at the point of analyzing the behavior of the asymptotic gradien
 
 and so $`|\Delta_{\infty}| = 1`$. If $`g_{\infty} = 0`$, we endeavor to bound $`\Delta_\infty`$ directly. Let $`\varphi(w) = \frac{4}{\pi}\arctan \sqrt{w}`$. It has second derivative
 ```math
-\varphi''(w) = - \frac{1+3w}{\pi w^{3/2}(1+w)^2} < 0
+\varphi''(w) = - \frac{1+3w}{\pi w^{3/2}(1+w)^2} \lt 0
 ```
 
-for $`w > 0`$, so $`\varphi(w)`$ is concave in the same domain. By Jensen's inequality and the bound on the second moment of $`u_t`$ in the AdamW theorem ([Section 1](#1-implicit-bias-of-adamw)),
+for $`w \gt 0`$, so $`\varphi(w)`$ is concave in the same domain. By Jensen's inequality and the bound on the second moment of $`u_t`$ in the AdamW theorem ([Section 1](#1-implicit-bias-of-adamw)),
 
 ```math
 \begin{aligned}
@@ -315,66 +315,66 @@ If $`x\to x_\infty`$ converges under this algorithm, then
 
 2. With $`R = ||x_\infty||_2`$, $`x_\infty`$ is a KKT point of the $`\ell_2`$-norm constrained optimization problem
 
-    ```math
-    \min_{||x||_2 \leq R} L(x).
-    ```
+```math
+\min_{||x||_2 \leq R} L(x).
+```
 
 3. Further, if $`L`$ is convex, $`x_\infty \in \text{argmin}_{||x||_2\leq R}L(x)`$ is a global minimizer.
 
-Note that the $`\ell_2`$-norm $`R`$ of $`x_\infty`$ is unbounded, in contrast to the $`\ell_\infty`$ case where the norm is bounded by $`1/\lambda < \infty`$.
+Note that the $`\ell_2`$-norm $`R`$ of $`x_\infty`$ is unbounded, in contrast to the $`\ell_\infty`$ case where the norm is bounded by $`1/\lambda \lt \infty`$.
 
 *Proof.* 
 
 1. Define $`c_t = \nabla L(x_t) + \lambda x_t`$ and $`u_t = c_t + \beta v_{t+1}`$. Since $`\nabla L`$ is continuous, $`c_t \to c_\infty = \nabla L(x_\infty) + \lambda x_\infty`$ as $`t\to\infty`$. The recursion on momentum $`v_t`$ says $`v_{t+1} = \beta v_t + c_t`$, so
 
-    ```math
-    v_{t+1} = \beta^{t+1}v_0 + \sum_{i=0}^{t} \beta^{t-i}c_i.
-    ```
+```math
+v_{t+1} = \beta^{t+1}v_0 + \sum_{i=0}^{t} \beta^{t-i}c_i.
+```
 
-    Using $`c_\infty/(1-\beta) = \sum_{i\geq 0}\beta^i c_\infty = \sum_{i=0}^{t}\beta^i c_\infty + \sum_{i>t}\beta^i c_\infty`$,
+Using $`c_\infty/(1-\beta) = \sum_{i\geq 0}\beta^i c_\infty = \sum_{i=0}^{t}\beta^i c_\infty + \sum_{i \gt t}\beta^i c_\infty`$,
 
-    ```math
-    v_{t+1} - \frac{c_\infty}{1-\beta} = \beta^{t+1}v_0 + \sum_{i=0}^{t}\beta^{t-i}(c_i - c_\infty) - \frac{\beta^{t+1}}{1-\beta}c_\infty.
-    ```
+```math
+v_{t+1} - \frac{c_\infty}{1-\beta} = \beta^{t+1}v_0 + \sum_{i=0}^{t}\beta^{t-i}(c_i - c_\infty) - \frac{\beta^{t+1}}{1-\beta}c_\infty.
+```
 
-    The first and last term vanish as $`t\to\infty`$ since $`\beta < 1`$. For the middle term, let $`M = \sup_i ||c_i - c_\infty|| < \infty`$, finite because $`c_i \to c_\infty`$. For every $`\epsilon > 0`$ let $`N`$ be such that $`||c_i - c_\infty|| \leq \epsilon`$ for all $`i \geq N`$. Then for $`t \geq N`$:
+The first and last term vanish as $`t\to\infty`$ since $`\beta \lt 1`$. For the middle term, let $`M = \sup_i ||c_i - c_\infty|| \lt \infty`$, finite because $`c_i \to c_\infty`$. For every $`\epsilon \gt 0`$ let $`N`$ be such that $`||c_i - c_\infty|| \leq \epsilon`$ for all $`i \geq N`$. Then for $`t \geq N`$:
 
-    ```math
-    \left|\left|\sum_{i=0}^{t}\beta^{t-i}(c_i - c_\infty)\right|\right| \leq M\sum_{i<N}\beta^{t-i} + \epsilon\sum_{i=N}^{t}\beta^{t-i} \leq \frac{M\beta^{t-N+1}}{1-\beta} + \frac{\epsilon}{1-\beta},
-    ```
+```math
+\left|\left|\sum_{i=0}^{t}\beta^{t-i}(c_i - c_\infty)\right|\right| \leq M\sum_{i \lt N}\beta^{t-i} + \epsilon\sum_{i=N}^{t}\beta^{t-i} \leq \frac{M\beta^{t-N+1}}{1-\beta} + \frac{\epsilon}{1-\beta},
+```
 
-    and the first term vanishes for sufficiently-large $`t`$. Therefore, $`v_t \to c_\infty/(1-\beta)`$. It follows that
+and the first term vanishes for sufficiently-large $`t`$. Therefore, $`v_t \to c_\infty/(1-\beta)`$. It follows that
 
-    ```math
-    u_t = c_t + \beta v_{t+1} \to c_\infty + \frac{\beta c_\infty}{1-\beta} = \frac{c_\infty}{1-\beta}.
-    ```
+```math
+u_t = c_t + \beta v_{t+1} \to c_\infty + \frac{\beta c_\infty}{1-\beta} = \frac{c_\infty}{1-\beta}.
+```
 
-    Suppose for the sake of contradiction that $`c_\infty = \nabla L(x_\infty) + \lambda x_\infty \neq 0`$. First,
+Suppose for the sake of contradiction that $`c_\infty = \nabla L(x_\infty) + \lambda x_\infty \neq 0`$. First,
 
-    ```math
-    \langle c_\infty, u_t\rangle \to \frac{||c_\infty||_2^2}{1-\beta} > 0.
-    ```
+```math
+\langle c_\infty, u_t\rangle \to \frac{||c_\infty||_2^2}{1-\beta} \gt 0.
+```
 
-    Thus, there exists $`s`$ such that $`\langle c_\infty, u_t\rangle \geq ||c_\infty||_2^2/(2(1-\beta))`$ for all $`t \geq s`$. Then
+Thus, there exists $`s`$ such that $`\langle c_\infty, u_t\rangle \geq ||c_\infty||_2^2/(2(1-\beta))`$ for all $`t \geq s`$. Then
 
-    ```math
-    \langle c_\infty, x_0 - x_T\rangle = \sum_{t=0}^{T-1} \eta_t \langle c_\infty, u_t\rangle \geq \sum_{t=0}^{s-1}\eta_t \langle c_\infty, u_t\rangle + \frac{||c_\infty||_2^2}{2(1-\beta)} \sum_{i=s}^{T-1} \eta_i.
-    ```
+```math
+\langle c_\infty, x_0 - x_T\rangle = \sum_{t=0}^{T-1} \eta_t \langle c_\infty, u_t\rangle \geq \sum_{t=0}^{s-1}\eta_t \langle c_\infty, u_t\rangle + \frac{||c_\infty||_2^2}{2(1-\beta)} \sum_{i=s}^{T-1} \eta_i.
+```
 
-    This quantity goes to $`\infty`$ as $`T\to \infty`$, contradicting the assumption that $`x_t`$ converges to (finite) $`x_\infty`$. Therefore $`c_\infty = 0`$.
+This quantity goes to $`\infty`$ as $`T\to \infty`$, contradicting the assumption that $`x_t`$ converges to (finite) $`x_\infty`$. Therefore $`c_\infty = 0`$.
 
 2. Let $`R = ||x_\infty||_2`$ and
 
-    ```math
-    g(x) = \frac{1}{2}\left( ||x||_2^2 - R^2 \right).
-    ```
+```math
+g(x) = \frac{1}{2}\left( ||x||_2^2 - R^2 \right).
+```
 
-    The Lagrangian for the constrained optimization problem is given by
+The Lagrangian for the constrained optimization problem is given by
 
-    ```math
-    \mathcal{L}(x, \mu) = L(x) + \mu g(x).
-    ```
+```math
+\mathcal{L}(x, \mu) = L(x) + \mu g(x).
+```
 
-    Primal feasibility $`g(x_\infty) \leq 0`$ is true by definition of $`R`$. Stationarity $`\nabla L(x_\infty) + \mu x_\infty = 0`$ is true for dual variable $`\mu^{\ast} = \lambda > 0`$, which also satisfies dual feasibility. Complementary slackness $`\mu g(x_\infty) = 0`$ holds since $`g(x_\infty) = 0`$.
+Primal feasibility $`g(x_\infty) \leq 0`$ is true by definition of $`R`$. Stationarity $`\nabla L(x_\infty) + \mu x_\infty = 0`$ is true for dual variable $`\mu^{\ast} = \lambda \gt 0`$, which also satisfies dual feasibility. Complementary slackness $`\mu g(x_\infty) = 0`$ holds since $`g(x_\infty) = 0`$.
 
 3. $`L`$ and the constraint are convex, so KKT conditions are sufficient for a global minimum.$`\qquad \Box`$
