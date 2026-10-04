@@ -498,9 +498,9 @@ If $`x\to x_\infty`$ converges under this algorithm, then
 
 2. With $`R = ||x_\infty||_2`$, $`x_\infty`$ is a KKT point of the $`\ell_2`$-norm constrained optimization problem
 
-    ```math
-    \min_{||x||_2 \leq R} L(x).
-    ```
+  ```math
+  \min_{||x||_2 \leq R} L(x).
+  ```
 
 3. Further, if $`L`$ is convex, $`x_\infty \in \text{argmin}_{||x||_2\leq R}L(x)`$ is a global minimizer.
 
@@ -530,7 +530,7 @@ The idea behind both methods is to optimize a loss function, the *strain*, which
 Since CKA and PWCCA compute similarity scores, their complement $`1-\rho`$ is a *dissimilarity* score rather than a distance (they do not satisfy the triangle inequality, and in the case of PWCCA, are not even symmetric). Therefore we use Non-metric Multi-Dimensional Scaling (NMDS), which aims to optimize the objective
 
 ```math
-S(x_1,\dots, x_n; f) = \left(\frac{\sum_{i<j}(f(d_{ij}) - \hat{d}_{ij})^2}{\sum_{i<j}{\hat{d}_{ij}}^2}\right)^{1/2}
+S(x_1,\dots, x_n; \, f) = \left(\frac{\sum_{i\lt j}(f(d_{ij}) - \hat{d}_{ij})^2}{\sum_{i\lt j}\hat{d}_{ij}^2}\right)^{1/2}
 ```
 
 Here $`f`$ is a monotonically-increasing function. NMDS is optimized by iteratively optimizing the two objectives $`\hat f = \text{argmin}_f S(x_1, \dots, x_n; f)`$ and $`\text{argmin}_{\{x_i\}_{i=1}^n} S(x_1,\dots, x_n; \hat f)`$.
@@ -575,10 +575,10 @@ An easy way to organize RSA scores between models is to use a similarity matrix.
 <table align="center">
   <tr>
     <td align="center"><img src="assets/trainmode_opA_adam_atan2_0_opB_adam_atan2_0_cka_0_v_final.png" width="160"><br><sub>Epoch 0</sub></td>
-    <td align="center"><img src="assets/trainmode_opA_adam_atan2_0_opB_adam_atan2_0_cka_30_v_final.png" width="160"><br><sub>Epoch 30</sub></td>
-    <td align="center"><img src="assets/trainmode_opA_adam_atan2_0_opB_adam_atan2_0_cka_60_v_final.png" width="160"><br><sub>Epoch 60</sub></td>
-    <td align="center"><img src="assets/trainmode_opA_adam_atan2_0_opB_adam_atan2_0_cka_90_v_final.png" width="160"><br><sub>Epoch 90</sub></td>
-    <td align="center"><img src="assets/trainmode_opA_adam_atan2_0_opB_adam_atan2_0_cka_100_v_final.png" width="160"><br><sub>Epoch 100</sub></td>
+    <td align="center"><img src="assets/trainmode_opA_adam_atan2_0_opB_adam_atan2_0_cka_6_v_final.png" width="160"><br><sub>Epoch 30</sub></td>
+    <td align="center"><img src="assets/trainmode_opA_adam_atan2_0_opB_adam_atan2_0_cka_12_v_final.png" width="160"><br><sub>Epoch 60</sub></td>
+    <td align="center"><img src="assets/trainmode_opA_adam_atan2_0_opB_adam_atan2_0_cka_18_v_final.png" width="160"><br><sub>Epoch 90</sub></td>
+    <td align="center"><img src="assets/trainmode_opA_adam_atan2_0_opB_adam_atan2_0_cka_final.png" width="160"><br><sub>Epoch 100</sub></td>
   </tr>
 </table>
 <p align="center"><em>ayerwise CKA similarity of a model trained with Adam-atan2 at each epoch versus at the end of training.</em></p>
@@ -589,7 +589,7 @@ The values on the diagonal of this matrix converge to unity because every layer 
   <tr>
     <td align="center"><img src="assets/trainmode_opA_adam_atan2_0_opB_adamw_5_cka_final.png" width="280"><br><sub>(a) Adam-atan2 ($x$) vs. AdamW ($y$)</sub></td>
     <td align="center"><img src="assets/trainmode_opA_adam_atan2_0_opB_sgd_5_cka_final.png" width="280"><br><sub>(b) Adam-atan2 ($x$) vs. SGD ($y$)</sub></td>
-    <td align="center"><img src="assets/assets/trainmode_opA_adamw_0_opB_sgd_5_cka_final.png" width="280"><br><sub>(c) AdamW ($x$) vs. SGD ($y$)</sub></td>
+    <td align="center"><img src="assets/trainmode_opA_adamw_0_opB_sgd_5_cka_final.png" width="280"><br><sub>(c) AdamW ($x$) vs. SGD ($y$)</sub></td>
   </tr>
 </table>
 <p align="center"><em>Layerwise CKA similarity between models trained using different optimizers.</em></p>
