@@ -556,11 +556,21 @@ Thus, Isomap performs well on datapoints which are assumed to have manifold stru
 
 All experiments were performed using a 22-layer VGG-style convolutional autoencoder, whose encoder has identical structure to that of [Morcos et al. (2018)](https://proceedings.neurips.cc/paper_files/paper/2018/hash/a7a3d70c6d17a73140918996d03c014f-Abstract.html) and kernel size of $`3\times 3`$ and padding of 1. Downsampling is accomplished with convolutional layers `Conv2d` with stride of 2 at layers 3, 6, 9. The number of channels of the encoder is 64, 64, 128, 128, 128, 256, 256, 256, 512, 512, 512. The convolutional decoder is an exact mirror of the encoder with `ConvTranspose2d` in place of `Conv2d`. This architecture is summarized in the Figure below
 
-FIGURE: cae
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/70a59374-6e44-46bb-99d1-fff1f714172e" width="600" alt="cae">
+  <br>
+  <em>The feedforward convolutional autoencoder architecture used for all studies.</em>
+</p>
 
 ### 3.2 Dataset
 
-Models were trained on the CIFAR-10 dataset with 50000 images split into 40000 images for training and 10000 images for validation and activation extraction. Image augmentation was not used, though in hindsight it may have been a good idea to do so to encourage rich feature learning. Comparing training and validation loss curves revealed that all models were able to generalize.
+Models were trained on the CIFAR-10 dataset with 50000 images split into 40000 images for training and 10000 images for validation and activation extraction. Image augmentation was not used, though in hindsight it may have been a good idea to do so to encourage rich feature learning. Comparing training and validation loss curves revealed that all models were able to generalize. We show some reconstructions of CIFAR-10 images below using models trained with the different optimizers.
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/0dace4e6-1e8b-4429-88ad-e3fd91efd278" width="400" alt="cifar-reconstructions">
+  <br>
+  <em>Reconstructions of CIFAR-10 images.</em>
+</p>
 
 ### 3.3 Training Protocol and Hyperparameters
 
@@ -602,8 +612,6 @@ The values on the diagonal of this matrix converge to unity because every layer 
 
 We plot the similarity between layers trained using different optimizers as a function of training epoch. To prevent the plot from being too cluttered, we only consider the last layer of each convolutional block: layer 2 (b1_out), layer 5 (b2_out), layer 8 (b3_out), and layer 11 (b4_out). First we present the figures for CKA similarity:
 
-FIGURES: plot_1_cka_adamw_adam_atan2, plot_1_cka_sgd_adam_atan2, plot_1_cka_sgd_adamw
-
 <table align="center">
   <tr>
     <td align="center"><img src="assets/plot_1_cka_adamw_adam_atan2.png" width="280"><br><sub>(a) AdamW vs. Adam-atan2</sub></td>
@@ -614,8 +622,6 @@ FIGURES: plot_1_cka_adamw_adam_atan2, plot_1_cka_sgd_adam_atan2, plot_1_cka_sgd_
 <p align="center"><em>CKA similarity between layers of models trained with different optimizers as a function of training epoch.</em></p>
 
 Comparing models trained with SGD versus adaptive algorithms, we see that their RSA scores diverge over the course of training, with deeper layers drifting further than shallower ones. By contrast, the RSA score between representations learned with AdamW and Adam-atan2 do not display a discernible pattern. We see a similar pattern when measuring similarity using PWCCA, though the plot shows much more variability in early stages of training:
-
-FIGURES: plot_1_pwcca_adam_atan2_adamw, plot_1_pwcca_sgd_adam_atan2, plot_1_pwcca_sgd_adamw
 
 <table align="center">
   <tr>
@@ -638,8 +644,6 @@ The former explanation suggests a difference in learned features based on optimi
 
 We plot the RSA self-similarity scores of layers during training versus at their final state, for models trained with AdamW, Adam-atan2, and SGD.
 
-FIGURE: plot_2_cka_sgd, plot_2_cka_adamw, plot_2_cka_adam_atan2
-
 <table align="center">
   <tr>
     <td align="center"><img src="assets/plot_2_cka_sgd.png" width="280"><br><sub>(a) SGD</sub></td>
@@ -653,8 +657,6 @@ The results show a qualitative difference in the way layers converge to their fi
 
 Now consider the same figures, but with similarities calculated by PWCCA:
 
-FIGURE: plot_2_pwcca_sgd, plot_2_pwcca_adamw, plot_2_pwcca_adam_atan2
-
 <table align="center">
   <tr>
     <td align="center"><img src="assets/plot_2_pwcca_sgd.png" width="280"><br><sub>(a) SGD</sub></td>
@@ -665,8 +667,6 @@ FIGURE: plot_2_pwcca_sgd, plot_2_pwcca_adamw, plot_2_pwcca_adam_atan2
 <p align="center"><em>PWCCA self-similarity of layers during training versus their final state.</em></p>
 
 We see that the differences between SGD and adaptive methods disappear! So is the aforementioned phenomenon present or not? To answer this question, we performed a study to understand the sample efficiency of PWCCA and CKA. With fixed weights, we computed the PWCCA and CKA scores of AdamW versus SGD-optimized models using different number of samples $`m`$, i.e. so the activation vector takes the form $`[z_1^{(\ell)}, z_2^{(\ell)},\dots, z_m^{(\ell)}]`$. We then plotted the scores as a function of $`m`$:
-
-FIGURE: probeset_resolution_adamw_sgd_cka, probeset_resolution_adamw_sgd_pwcca
 
 <table align="center">
   <tr>
@@ -682,8 +682,6 @@ The pre-activation for each layer was computed for three different i.i.d. draws 
 
 For each optimizer $`\in \{\text{SGD}, \text{AdamW}, \text{Adam-atan2}\}`$, we train ten models with different random initializations and data-loading order. We then compute the (banded mean diagonal) aggregate dissimilarity scores (see [above](#23-aggregate-model-to-model-metrics)) for every pair of models among the thirty models. We then optimized non-metric MDS and Isomap visualization algorithms with input the aggregate RSA-dissimilarity scores to obtain the following low-dimensional representations of model space.
 
-FIGURE: plot_4_BDS_mds
-
 <p align="center">
   <img src="assets/plot_4_BDS_mds.png" width="500" alt="MDS embedding (BDD)">
   <br>
@@ -696,8 +694,6 @@ The next most important direction distinguishes the two adaptive optimizers. Not
 
 This conclusion is supported by plotting the aggregate similarity between models as a function of training epoch. The CKA similarity scores between the adaptive algorithms hover at a much higher value throughout training as compared to when compared with SGD.
 
-FIGURE: plot_3_BDS_cka_sgd_adamw
-
 <p align="center">
   <img src="assets/plot_3_BDS_cka_sgd_adamw.png" width="500" alt="MDS embedding (BDD)">
   <br>
@@ -706,8 +702,6 @@ FIGURE: plot_3_BDS_cka_sgd_adamw
 
 The Isomap visualization shows a different characterization of the loss landscape. The models trained with adaptive optimizers are no longer well-separated, though the models trained with adaptive optimizers and SGD can still be distinguished by a simple elliptical boundary.
 
-FIGURE: plot_4_BDS_isomap
-
 <p align="center">
   <img src="assets/plot_4_BDS_isomap.png" width="500" alt="MDS embedding (BDD)">
   <br>
@@ -715,8 +709,6 @@ FIGURE: plot_4_BDS_isomap
 </p>
 
 The previous visualizations used banded diagonal dissimilarity (BDD) as the non-metric score for MDS and Isomap. We found that when using Mean Diagonal Dissimilarity (MDD) there were outlier points far from the main cluster (note the scale on the axes). We attribute these outlier points as having learned features in a layer which is offset as compared to most of the other models.
-
-FIGURE (MDS + Isomap, MDD)
 
 <table align="center">
   <tr>
@@ -770,4 +762,4 @@ Another arena which benefits from a better understanding of rich feature learnin
 
 If you make use of this code or analysis in any way, please consider citing this repository as follows:
 
-> **Hu, T. W.** (2026). *On Visualizing the Geometry of Optimization*. Retrieved from https://github.com/tw-hu/nn_optimization_similarity
+> **Hu, T. W.** (2026). *On Visualizing the Geometry of Optimization*. Retrieved from https://github.com/tw-hu/nn-optimization-similarity
