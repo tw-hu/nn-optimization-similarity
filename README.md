@@ -10,6 +10,10 @@ This repository is a detailed writeup of the theory, methodology, and results of
 </table>
 <p align="center"><em>Similarity between layers of a neural network at training time versus its final state.</em></p>
 
+## Abstract
+
+Neural networks with the same architecture, trained on the same data to comparable loss, can nonetheless differ depending on the optimization algorithm used. This dependence is attributed to the optimizer's *implicit bias*: among the many parameter configurations that fit the training data, each optimizer converges preferentially to particular ones. In this project, we ask whether these differences are detectable in the networks' internal representations and give an answer through the lens of representational similarity analysis (RSA), a technique from computational neuroscience which compares representations through the pairwise dissimilarities they induce between input. We find that the choice of optimizer leads to measurable differences in neural representations, even after accounting for variation due to random initialization and data ordering. On the theoretical side, we extend the characterization of optimizer implicit bias to Adam-atan2 and provide a satisfying explanation for our results.
+
 ## 1. Introduction
 
 ### 1.1 Motivation
